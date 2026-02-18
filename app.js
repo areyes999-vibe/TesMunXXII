@@ -475,7 +475,37 @@ function renderContact() {
     </div>`;
 }
 
-// ── Handbook Page (PDF Viewer) ──────────────────────
+// ── Resources / Sources ─────────────────────────────
+const RESOURCE_SOURCES = [
+    { id: 'handbook', name: 'Handbook', url: 'assets/docs/handbook.pdf', checked: true },
+];
+let activeResourceId = 'handbook';
+
+function getActiveResource() {
+    return RESOURCE_SOURCES.find(s => s.id === activeResourceId) || RESOURCE_SOURCES[0];
+}
+
+function selectResourceSource(id) {
+    activeResourceId = id;
+    pdfDoc = null; // reset so it reloads
+    document.getElementById('app').innerHTML = renderHandbook();
+}
+
+function toggleAllSources() {
+    const allChecked = RESOURCE_SOURCES.every(s => s.checked);
+    RESOURCE_SOURCES.forEach(s => s.checked = !allChecked);
+    document.getElementById('app').innerHTML = renderHandbook();
+}
+
+function updateSourceSelection() {
+    document.querySelectorAll('.source-checkbox').forEach(cb => {
+        const src = RESOURCE_SOURCES.find(s => s.id === cb.dataset.sourceId);
+        if (src) src.checked = cb.checked;
+    });
+    document.getElementById('app').innerHTML = renderHandbook();
+}
+
+// ── PDF Viewer State ────────────────────────────────
 const HANDBOOK_PDF_URL = 'assets/docs/handbook.pdf';
 let pdfDoc = null;
 let pdfScale = 1.5;
@@ -486,13 +516,59 @@ function renderHandbook() {
     // Schedule PDF load after DOM injection
     setTimeout(() => initPdfViewer(), 0);
 
-    return `<div class="flex-1 flex flex-col overflow-hidden page-enter">
+    const sourceListHtml = RESOURCE_SOURCES.map((src, i) => `
+            <div class="group flex items-center gap-3 px-6 py-3 cursor-pointer transition-all hover:bg-white/5 ${src.id === activeResourceId ? 'bg-secondary/20 border-l-2 border-accent' : 'border-l-2 border-transparent'}" onclick="selectResourceSource('${src.id}')">
+                <label class="flex items-center cursor-pointer" onclick="event.stopPropagation()">
+                    <input type="checkbox" class="source-checkbox sr-only" data-source-id="${src.id}" ${src.checked ? 'checked' : ''} onchange="updateSourceSelection()" />
+                    <span class="w-5 h-5 rounded border ${src.checked ? 'bg-accent border-accent' : 'border-gray-500'} flex items-center justify-center transition-colors">
+                        ${src.checked ? '<span class="material-symbols-outlined text-white text-sm">check</span>' : ''}
+                    </span>
+                </label>
+                <span class="material-symbols-outlined ${src.id === activeResourceId ? 'text-accent' : 'text-secondary'} text-lg shrink-0">picture_as_pdf</span>
+                <span class="text-sm ${src.id === activeResourceId ? 'text-white font-bold' : 'text-gray-300'} truncate flex-1">${src.name}</span>
+            </div>`).join('');
+
+    const allChecked = RESOURCE_SOURCES.every(s => s.checked);
+    const checkedCount = RESOURCE_SOURCES.filter(s => s.checked).length;
+
+    return `
+    <!-- Left Sidebar – Sources Panel -->
+    <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
+        <div class="p-8 pb-4">
+            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Sources</h3>
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Documents</h2>
+            <div class="h-0.5 w-12 bg-accent mt-4"></div>
+        </div>
+
+        <!-- Select All -->
+        <div class="flex items-center justify-between px-6 py-3 border-b border-white/5">
+            <label class="flex items-center gap-3 cursor-pointer" onclick="toggleAllSources()">
+                <span class="w-5 h-5 rounded border ${allChecked ? 'bg-accent border-accent' : 'border-gray-500'} flex items-center justify-center transition-colors">
+                    ${allChecked ? '<span class="material-symbols-outlined text-white text-sm">check</span>' : ''}
+                </span>
+                <span class="text-xs text-gray-400 font-display uppercase tracking-wider">Select all sources</span>
+            </label>
+            <span class="text-[10px] text-gray-500 font-mono">${checkedCount}/${RESOURCE_SOURCES.length}</span>
+        </div>
+
+        <!-- Source List -->
+        <nav class="flex-1 py-2 overflow-y-auto custom-scrollbar">
+            ${sourceListHtml}
+        </nav>
+
+        <!-- Download Active -->
+        <div class="mt-auto bg-black/20 p-6 border-t border-white/5">
+            <a href="${getActiveResource().url}" download="${getActiveResource().name}.pdf" class="bg-secondary hover:bg-secondary/80 text-white border border-secondary/50 rounded-lg px-4 py-2 transition-colors flex items-center justify-center gap-2 w-full" title="Download">
+                <span class="material-symbols-outlined text-lg">download</span>
+                <span class="text-xs font-display uppercase tracking-widest">Download PDF</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Center – PDF Viewer -->
+    <div class="flex-1 flex flex-col overflow-hidden page-enter">
         <!-- Toolbar -->
         <div class="shrink-0 bg-[#191b42] border-b border-white/10 px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-accent text-xl">menu_book</span>
-                <h1 class="font-display text-lg font-bold text-white uppercase tracking-widest">Handbook</h1>
-            </div>
             <div class="flex items-center gap-3 flex-wrap">
                 <!-- Page Nav -->
                 <div class="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-1.5 border border-white/10">
@@ -517,17 +593,11 @@ function renderHandbook() {
                         <span class="material-symbols-outlined text-lg">fit_width</span>
                     </button>
                 </div>
-                <!-- Actions -->
-                <div class="flex items-center gap-1">
-                    <button onclick="pdfPrint()" class="bg-black/30 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 rounded-lg px-3 py-1.5 transition-colors inline-flex items-center gap-2" title="Print">
-                        <span class="material-symbols-outlined text-lg">print</span>
-                        <span class="text-xs font-display uppercase tracking-widest hidden sm:inline">Print</span>
-                    </button>
-                    <a href="${HANDBOOK_PDF_URL}" download="TESMUN_XXII_Handbook.pdf" class="bg-secondary hover:bg-secondary/80 text-white border border-secondary/50 rounded-lg px-3 py-1.5 transition-colors inline-flex items-center gap-2" title="Download">
-                        <span class="material-symbols-outlined text-lg">download</span>
-                        <span class="text-xs font-display uppercase tracking-widest hidden sm:inline">Download</span>
-                    </a>
-                </div>
+                <!-- Print -->
+                <button onclick="pdfPrint()" class="bg-black/30 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 rounded-lg px-3 py-1.5 transition-colors inline-flex items-center gap-2" title="Print">
+                    <span class="material-symbols-outlined text-lg">print</span>
+                    <span class="text-xs font-display uppercase tracking-widest hidden sm:inline">Print</span>
+                </button>
             </div>
         </div>
         <!-- PDF Canvas Container -->
@@ -541,7 +611,215 @@ function renderHandbook() {
                 </div>
             </div>
         </div>
-    </div>`;
+    </div>
+
+    <!-- Right Sidebar – AI Assistant -->
+    <aside class="w-80 shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-hidden">
+        <div class="p-8 pb-4">
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mb-1">AI Assistant</h2>
+            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Ask TESMUN</h3>
+            <div class="h-0.5 w-12 bg-accent mt-4"></div>
+        </div>
+        <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4" id="chat-messages">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-accent text-sm">smart_toy</span>
+                </div>
+                <div class="bg-white/5 rounded-lg rounded-tl-none p-4 text-sm text-gray-300 leading-relaxed">
+                    Welcome! I can answer questions based on the selected source documents. I'll cite specific pages so you can verify my answers. Try asking about dress code, rules of procedure, committee topics, or anything in the sources. Click a <button class="citation-chip" style="cursor:default;pointer-events:none">1</button> to jump to that page in the document.
+                </div>
+            </div>
+        </div>
+        <div class="p-4 border-t border-white/5 bg-black/20">
+            <div class="flex items-center gap-2 bg-[#191b42] rounded-lg border border-white/10 px-3 py-2">
+                <input type="text" id="chat-input" placeholder="Ask about the selected sources…"
+                    class="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-500"
+                    onkeydown="if(event.key==='Enter')sendChatMessage()" />
+                <button onclick="sendChatMessage()" class="text-gray-500 hover:text-accent transition-colors" title="Send">
+                    <span class="material-symbols-outlined text-lg">send</span>
+                </button>
+            </div>
+            <p class="text-gray-600 text-[10px] mt-2 text-center uppercase tracking-wider">Powered by Gemini</p>
+        </div>
+    </aside>`;
+}
+
+// ── Chat System ─────────────────────────────────────
+const CHAT_WORKER_URL = 'https://tesmun-chat.tesmun-xxii-api.workers.dev/chat';
+let chatHistory = [];
+let lastCitations = []; // store citations from last bot response
+
+function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input?.value?.trim();
+    if (!msg) return;
+    input.value = '';
+
+    // Collect selected sources
+    const selectedSources = RESOURCE_SOURCES.filter(s => s.checked).map(s => s.id);
+
+    // Guard: no sources selected
+    if (!selectedSources.length) {
+        appendChatBubble('bot', 'Please select at least one source document in the left panel to search.', []);
+        return;
+    }
+
+    // Add user bubble
+    appendChatBubble('user', msg, []);
+    chatHistory.push({ role: 'user', text: msg });
+
+    // Show typing indicator with source count
+    const typingId = 'typing-' + Date.now();
+    const sourceNames = RESOURCE_SOURCES.filter(s => s.checked).map(s => s.name);
+    appendTypingIndicator(typingId, sourceNames);
+
+    // Call Worker
+    fetch(CHAT_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: msg,
+            history: chatHistory.slice(-10),
+            selectedSources,
+        }),
+    })
+        .then(res => res.json())
+        .then(data => {
+            removeTypingIndicator(typingId);
+            const reply = data.reply || data.error || 'Sorry, something went wrong.';
+            const citations = data.citations || [];
+            lastCitations = citations;
+            appendChatBubble('bot', reply, citations);
+            chatHistory.push({ role: 'model', text: reply });
+        })
+        .catch(err => {
+            removeTypingIndicator(typingId);
+            appendChatBubble('bot', 'Unable to reach the server. Please try again.', []);
+            console.error('Chat error:', err);
+        });
+}
+
+/**
+ * Render a chat bubble. For bot messages, parse [1] citation chips.
+ */
+function appendChatBubble(role, text, citations) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return;
+    const div = document.createElement('div');
+    div.className = 'flex gap-3' + (role === 'user' ? ' flex-row-reverse' : '');
+    const iconBg = role === 'user' ? 'bg-secondary/30' : 'bg-accent/20';
+    const iconColor = role === 'user' ? 'text-white' : 'text-accent';
+    const iconName = role === 'user' ? 'person' : 'smart_toy';
+    const bubbleBg = role === 'user' ? 'bg-secondary/20 rounded-tr-none' : 'bg-white/5 rounded-tl-none';
+
+    // Process text: escape HTML first, then inject citation chips for bot messages
+    let processedText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+
+    if (role === 'bot' && citations && citations.length > 0) {
+        // Replace [1], [2] etc. with clickable citation chips
+        processedText = processedText.replace(/\[(\d+)\]/g, (match, num) => {
+            const cit = citations.find(c => c.id === parseInt(num, 10));
+            if (cit) {
+                return `<button class="citation-chip" onclick="scrollToCitation(${cit.id})" title="${cit.sourceName} — Page ${cit.page}">${num}</button>`;
+            }
+            return match;
+        });
+    }
+
+    // Build references section for bot messages with citations
+    let refsHtml = '';
+    if (role === 'bot' && citations && citations.length > 0) {
+        const refItems = citations.map(c =>
+            `<div class="citation-ref" onclick="scrollToCitation(${c.id})">
+                <span class="citation-ref-num">${c.id}</span>
+                <span class="citation-ref-text">${c.sourceName} — p.${c.page}</span>
+            </div>`
+        ).join('');
+        refsHtml = `<div class="citation-refs">
+            <div class="citation-refs-header">Sources</div>
+            ${refItems}
+        </div>`;
+    }
+
+    div.innerHTML = `
+        <div class="w-8 h-8 rounded-full ${iconBg} flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined ${iconColor} text-sm">${iconName}</span>
+        </div>
+        <div class="${bubbleBg} rounded-lg p-4 text-sm text-gray-300 leading-relaxed max-w-[85%]">
+            ${processedText}
+            ${refsHtml}
+        </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+/**
+ * Scroll PDF viewer to the page cited by citation ID.
+ */
+function scrollToCitation(citationId) {
+    const cit = lastCitations.find(c => c.id === citationId);
+    if (!cit) return;
+
+    // If the cited source is not the active document, switch to it first
+    if (cit.sourceId !== activeResourceId) {
+        const src = RESOURCE_SOURCES.find(s => s.id === cit.sourceId);
+        if (src) {
+            activeResourceId = cit.sourceId;
+            pdfDoc = null;
+            // We need to re-render, then scroll after PDF loads
+            document.getElementById('app').innerHTML = renderHandbook();
+            // Wait for PDF to load, then scroll
+            const checkAndScroll = setInterval(() => {
+                if (pdfDoc && document.getElementById(`pdf-page-${cit.page}`)) {
+                    clearInterval(checkAndScroll);
+                    scrollToPageWithHighlight(cit.page);
+                }
+            }, 200);
+            setTimeout(() => clearInterval(checkAndScroll), 10000); // safety timeout
+            return;
+        }
+    }
+
+    scrollToPageWithHighlight(cit.page);
+}
+
+/**
+ * Scroll to a PDF page and briefly highlight it with a glow effect.
+ */
+function scrollToPageWithHighlight(pageNum) {
+    const el = document.getElementById(`pdf-page-${pageNum}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.add('page-citation-glow');
+    setTimeout(() => el.classList.remove('page-citation-glow'), 2500);
+    updatePageInfo();
+}
+
+function appendTypingIndicator(id, sourceNames) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return;
+    const div = document.createElement('div');
+    div.id = id;
+    div.className = 'flex gap-3';
+    const searchLabel = sourceNames && sourceNames.length
+        ? `Searching ${sourceNames.length} source${sourceNames.length > 1 ? 's' : ''}…`
+        : 'Thinking…';
+    div.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-accent text-sm animate-pulse">smart_toy</span>
+        </div>
+        <div class="bg-white/5 rounded-lg rounded-tl-none p-4 text-sm text-gray-400">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex gap-1"><span class="animate-bounce" style="animation-delay:0ms">●</span><span class="animate-bounce" style="animation-delay:150ms">●</span><span class="animate-bounce" style="animation-delay:300ms">●</span></span>
+                <span class="text-[10px] uppercase tracking-wider text-gray-500">${searchLabel}</span>
+            </div>
+        </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function removeTypingIndicator(id) {
+    document.getElementById(id)?.remove();
 }
 
 function initPdfViewer() {
@@ -551,7 +829,7 @@ function initPdfViewer() {
     }
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    pdfjsLib.getDocument(HANDBOOK_PDF_URL).promise.then(doc => {
+    pdfjsLib.getDocument(getActiveResource().url).promise.then(doc => {
         pdfDoc = doc;
         renderAllPages();
     }).catch(err => {
@@ -657,7 +935,7 @@ function pdfFitWidth() {
 }
 
 function pdfPrint() {
-    const printWindow = window.open(HANDBOOK_PDF_URL);
+    const printWindow = window.open(getActiveResource().url);
     if (printWindow) {
         printWindow.addEventListener('load', () => {
             printWindow.focus();

@@ -1783,6 +1783,127 @@ video {
     -webkit-text-stroke: 1px #FF8C00;
     color: transparent
 }
-.bg-hero-pattern{background-image:linear-gradient(180deg,rgba(19,21,54,.4),rgba(19,21,54,.9)),url(group-photo.jpg) !important}
 
-.bg-hero-pattern{background-position:center 35% !important}
+.bg-hero-pattern {
+    background-image: linear-gradient(180deg, rgba(19, 21, 54, .4), rgba(19, 21, 54, .9)), url(group-photo.jpg) !important
+}
+
+.bg-hero-pattern {
+    background-position: center 35% !important
+}
+
+.nav-item {
+    border-top: none !important
+}
+
+.nav-item.active {
+    border-top: none !important
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0
+}
+
+/* ── Citation Chips ────────────────────────────────── */
+.citation-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    margin: 0 1px;
+    padding: 0 5px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    line-height: 1;
+    color: #fff;
+    background: #00b894;
+    border: none;
+    border-radius: 9px;
+    cursor: pointer;
+    vertical-align: super;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.citation-chip:hover {
+    background: #00cba9;
+    transform: scale(1.15);
+}
+
+/* ── Citation Reference List ───────────────────────── */
+.citation-refs {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.citation-refs-header {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 4px;
+}
+
+.citation-ref {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.citation-ref:hover {
+    color: #00b894;
+}
+
+.citation-ref-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 9px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    color: #fff;
+    background: rgba(0, 184, 148, 0.3);
+    border-radius: 8px;
+}
+
+.citation-ref-text {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Page Citation Glow ────────────────────────────── */
+@keyframes page-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.6);
+    }
+
+    50% {
+        box-shadow: 0 0 20px 4px rgba(0, 184, 148, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 184, 148, 0);
+    }
+}
+
+.page-citation-glow {
+    animation: page-glow 1.2s ease-in-out 2;
+    border-radius: 4px;
+}
