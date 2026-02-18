@@ -225,79 +225,107 @@ function renderChairCard(ch) {
     </div>`;
 }
 
-// ── Campus Page ─────────────────────────────────────
+// ── Locations Page ──────────────────────────────────
+let currentVenue = 'tes';
+let currentVenueItem = 'google-maps';
+
+const VENUES = [
+    {
+        id: 'tes', name: 'The English School', icon: 'school', days: 'Days 1 & 4',
+        items: [
+            { id: 'google-maps', name: 'Google Maps', icon: 'map', desc: 'Calle 170 #15-68, Bogotá, Colombia', embed: 'https://maps.google.com/maps?q=The+English+School,+Bogota&ll=4.7500062,-74.0385556&z=16&output=embed' },
+            { id: 'campus-map', name: 'Campus Map', icon: 'location_on', desc: 'School campus layout and key locations.', embed: 'assets/docs/tes-campus-map.pdf#navpanes=0&view=FitH' },
+            { id: 'virtual-tour', name: 'Virtual Tour', icon: 'view_in_ar', desc: 'Explore the campus from anywhere in the world.', link: 'https://www.englishschool.edu.co/tour/' }
+        ]
+    },
+    {
+        id: 'sabana', name: 'La Sabana', icon: 'account_balance', days: 'Days 2 & 3',
+        items: [
+            { id: 'google-maps', name: 'Google Maps', icon: 'map', desc: 'Km 7, Autopista Norte de Bogotá, Chía, Cundinamarca, Colombia', embed: 'https://maps.google.com/maps?q=Universidad+de+La+Sabana&ll=4.8615787,-74.0325368&z=16&output=embed' },
+            { id: 'campus-map', name: 'Campus Map', icon: 'location_on', desc: 'Navigate the conference venue and key locations.', ph: 'Interactive campus map will be displayed here.' },
+            { id: 'virtual-tour', name: 'Virtual Tour', icon: 'view_in_ar', desc: 'Explore the campus from anywhere in the world.', embed: 'https://www.unisabana.edu.co/tour-virtual/' },
+            { id: 'promo-video', name: 'Promotional Video', icon: 'play_circle', desc: 'Conference highlights and campus overview.', ph: 'Video player will be embedded here.' }
+        ]
+    }
+];
+
 function renderCampus() {
-    return `<div class="flex-1 overflow-y-auto custom-scrollbar page-enter px-8 py-12 lg:px-16">
-        <div class="max-w-6xl mx-auto">
-            <p class="text-accent font-display text-xs uppercase tracking-[0.4em] mb-4">Venue</p>
-            <h1 class="text-6xl md:text-8xl font-display font-bold text-white leading-none tracking-tighter mb-2">Campus</h1>
-            <p class="text-xl text-gray-300 font-light mt-4 mb-12 border-l-4 border-accent pl-6">Universidad de La Sabana — Chía, Colombia</p>
+    const venue = VENUES.find(v => v.id === currentVenue) || VENUES[0];
+    const item = venue.items.find(it => it.id === currentVenueItem) || venue.items[0];
+
+    return `
+    <!-- Left Sidebar -->
+    <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
+        <div class="p-8 border-b border-white/5">
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em]">Conference Venues</h2>
+        </div>
+        <nav class="flex-1 py-4">
+            ${VENUES.map(v => {
+        const isActive = v.id === currentVenue;
+        return `<div class="mb-1">
+                    <a onclick="currentVenue='${v.id}';currentVenueItem='${v.items[0].id}';render()" class="sidebar-link ${isActive ? 'active' : ''} group flex items-center px-8 py-4 transition-all relative overflow-hidden cursor-pointer ${isActive ? 'bg-secondary text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}">
+                        ${isActive ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>' : ''}
+                        <span class="material-symbols-outlined mr-4 ${isActive ? 'text-accent' : ''}">${v.icon}</span>
+                        <div class="flex flex-col">
+                            <span class="font-display uppercase tracking-widest text-sm ${isActive ? 'font-bold' : ''}">${v.name}</span>
+                            <span class="text-[10px] ${isActive ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider mt-0.5">${v.days}</span>
+                        </div>
+                        ${isActive ? '<span class="material-symbols-outlined ml-auto text-sm">expand_less</span>' : ''}
+                    </a>
+                    ${isActive ? `<div class="bg-[#141539] py-2">${v.items.map(it => `
+                        <a onclick="currentVenueItem='${it.id}';render()" class="flex items-center pl-16 pr-8 py-3 cursor-pointer transition-colors ${it.id === currentVenueItem ? 'text-white bg-white/5 border-r-4 border-accent' : 'text-gray-400 hover:text-white hover:bg-white/5'}">
+                            <span class="material-symbols-outlined mr-3 text-base ${it.id === currentVenueItem ? 'text-accent' : ''}">${it.icon}</span>
+                            <span class="font-display uppercase tracking-widest text-xs ${it.id === currentVenueItem ? 'font-bold text-accent' : ''}">${it.name}</span>
+                        </a>`).join('')}</div>` : ''}
+                </div>`;
+    }).join('')}
+        </nav>
+        <div class="p-6 mt-auto">
+            <div class="bg-black/20 rounded-lg p-5 border border-white/5">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-3">Quick Links</h3>
+                <div class="space-y-3">
+                    <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors cursor-pointer" onclick="navigateTo('schedule')"><span class="material-symbols-outlined text-base">event</span> Calendar</a>
+                    <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors cursor-pointer" onclick="navigateTo('committees')"><span class="material-symbols-outlined text-base">groups</span> Committees</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <!-- Center Content -->
+    <section class="flex-1 overflow-y-auto custom-scrollbar relative px-8 py-10 lg:px-16 lg:py-12 bg-tesmun-blue">
+        <div class="max-w-5xl mx-auto">
+            <div class="mb-12 border-b border-white/10 pb-12">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="bg-secondary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm">Active Venue</span>
+                    <span class="text-accent font-display text-xs uppercase tracking-widest">${venue.days}</span>
+                </div>
+                <h1 class="text-5xl lg:text-8xl font-display font-bold text-white leading-none tracking-tighter mb-2">${venue.name}</h1>
+            </div>
             <div class="space-y-8">
-                ${[
-            { title: 'Promotional Video', icon: 'play_circle', desc: 'Conference highlights and campus overview.', ph: 'Video player will be embedded here.' },
-            { title: 'Campus Map', icon: 'map', desc: 'Navigate the conference venue and key locations.', ph: 'Interactive campus map will be displayed here.' },
-            { title: '360° Virtual Tour', icon: 'view_in_ar', desc: 'Explore the campus from anywhere in the world.', ph: '360° virtual tour experience will be embedded here.' }
-        ].map(s => `
+                <h2 class="text-gray-500 font-display text-xs uppercase tracking-[0.3em] mb-4">${item.name}</h2>
                 <div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl overflow-hidden hover:border-accent/30 transition-all">
                     <div class="p-8">
                         <div class="flex items-center gap-3 mb-4">
-                            <span class="material-symbols-outlined text-accent text-2xl">${s.icon}</span>
-                            <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest">${s.title}</h2>
+                            <span class="material-symbols-outlined text-accent text-2xl">${item.icon}</span>
+                            <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest">${item.name}</h2>
                         </div>
-                        <p class="text-gray-400 text-sm mb-6">${s.desc}</p>
+                        <p class="text-gray-400 text-sm mb-6">${item.desc}</p>
                     </div>
-                    <div class="bg-black/30 border-t border-white/5 h-64 flex items-center justify-center">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined text-gray-600 text-6xl mb-3">${s.icon}</span>
-                            <p class="text-gray-500 text-sm font-display uppercase tracking-widest">${s.ph}</p>
-                        </div>
-                    </div>
-                </div>`).join('')}
+                    ${item.embed
+            ? `<div class="border-t border-white/5 ${item.embed.includes('.pdf') ? 'h-[1400px]' : 'h-[600px]'}"><iframe src="${item.embed}" class="w-full h-full" style="border:none" allowfullscreen loading="lazy"></iframe></div>`
+            : item.link
+                ? `<div class="bg-black/30 border-t border-white/5 py-16 flex items-center justify-center"><div class="text-center"><span class="material-symbols-outlined text-gray-500 text-6xl mb-6">${item.icon}</span><p class="text-gray-400 text-sm mb-8 max-w-md mx-auto">${item.desc}</p><a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/80 text-white px-8 py-4 rounded-lg font-display uppercase tracking-widest text-sm transition-colors"><span class="material-symbols-outlined">open_in_new</span>Open ${item.name}</a></div></div>`
+                : `<div class="bg-black/30 border-t border-white/5 h-96 flex items-center justify-center"><div class="text-center"><span class="material-symbols-outlined text-gray-600 text-6xl mb-3">${item.icon}</span><p class="text-gray-500 text-sm font-display uppercase tracking-widest">${item.ph}</p></div></div>`
+        }
+                </div>
             </div>
         </div>
-    </div>`;
+    </section>`;
 }
 
 // ── Schedule Page ───────────────────────────────────
 function renderSchedule() {
-    return `<div class="flex-1 overflow-y-auto custom-scrollbar page-enter px-8 py-12 lg:px-16">
-        <div class="max-w-5xl mx-auto">
-            <p class="text-accent font-display text-xs uppercase tracking-[0.4em] mb-4">Conference Agenda</p>
-            <h1 class="text-6xl md:text-8xl font-display font-bold text-white leading-none tracking-tighter mb-12">Schedule</h1>
-            <div class="space-y-12">
-                ${TESMUN_DATA.schedule.map(day => `
-                <div class="bg-[#1c1f4a]/30 border border-white/10 rounded-xl overflow-hidden hover:border-accent/20 transition-all">
-                    <div class="bg-secondary/20 border-b border-white/10 px-8 py-6 flex items-center justify-between">
-                        <div>
-                            <div class="flex items-center gap-3">
-                                <span class="bg-secondary text-white w-10 h-10 rounded-lg flex items-center justify-center font-display font-bold text-lg">${day.day}</span>
-                                <div>
-                                    <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest">${day.weekday}</h2>
-                                    <p class="text-gray-400 text-xs uppercase tracking-wider mt-0.5">Day ${day.day} of 4</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-accent"><span class="material-symbols-outlined text-lg">location_on</span><span class="text-xs font-display uppercase tracking-widest">${day.location}</span></div>
-                    </div>
-                    <div class="p-8">
-                        <div class="space-y-0 relative">
-                            <div class="absolute left-[5px] top-3 bottom-3 w-px bg-white/10"></div>
-                            ${day.events.map(e => `
-                            <div class="flex items-start gap-6 py-3 group">
-                                <div class="timeline-dot mt-1 group-hover:bg-white group-hover:scale-125 transition-all"></div>
-                                <div class="flex-1 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span class="material-symbols-outlined text-gray-500 group-hover:text-accent transition-colors">${e.icon}</span>
-                                        <span class="text-white font-medium text-sm group-hover:text-accent transition-colors">${e.title}</span>
-                                    </div>
-                                    <span class="text-gray-400 text-xs font-mono">${e.time}</span>
-                                </div>
-                            </div>`).join('')}
-                        </div>
-                    </div>
-                </div>`).join('')}
-            </div>
-        </div>
+    return `<div class="flex-1 overflow-auto page-enter flex items-center justify-center bg-tesmun-blue">
+        <img src="assets/schedule.png" alt="TESMUN XXII Schedule" class="w-full h-full object-contain" />
     </div>`;
 }
 
