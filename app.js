@@ -3,6 +3,66 @@
 let currentPage = 'about';
 let currentLevel = 'bootcamp';
 let currentCommittee = null;
+let currentLang = 'en'; // 'en' or 'es' — for future i18n
+
+// ── Language Toggle ──────────────────────────────────
+function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'es' : 'en';
+    const flag = currentLang === 'en' ? '🇪🇸' : '🇬🇧';
+    const label = currentLang === 'en' ? 'Español' : 'English';
+    // Update desktop
+    const df = document.getElementById('lang-flag');
+    const dl = document.getElementById('lang-label');
+    if (df) df.textContent = flag;
+    if (dl) dl.textContent = label;
+    // Update mobile
+    const mf = document.getElementById('lang-flag-mobile');
+    const ml = document.getElementById('lang-label-mobile');
+    if (mf) mf.textContent = flag;
+    if (ml) ml.textContent = label;
+    // TODO: re-render page content in selected language
+}
+
+// ── Committees Dropdown ──────────────────────────────
+function getAllCommitteesSorted() {
+    const all = [];
+    for (const level of Object.keys(TESMUN_DATA.committees)) {
+        for (const c of TESMUN_DATA.committees[level]) {
+            all.push({ ...c, level });
+        }
+    }
+    return all.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function toggleCommitteeDropdown(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('committees-dropdown');
+    const list = document.getElementById('committees-dropdown-list');
+    if (!dd.classList.contains('hidden')) {
+        dd.classList.add('hidden');
+        return;
+    }
+    // Populate
+    const committees = getAllCommitteesSorted();
+    list.innerHTML = committees.map(c =>
+        `<a class="px-4 py-2 text-sm text-white hover:bg-white/10 cursor-pointer font-body transition-colors"
+            onclick="selectCommitteeFromDropdown('${c.level}','${c.id}')">${c.name}</a>`
+    ).join('');
+    dd.classList.remove('hidden');
+}
+
+function selectCommitteeFromDropdown(level, id) {
+    document.getElementById('committees-dropdown').classList.add('hidden');
+    currentLevel = level;
+    currentCommittee = id;
+    navigateTo('committees');
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', () => {
+    const dd = document.getElementById('committees-dropdown');
+    if (dd && !dd.classList.contains('hidden')) dd.classList.add('hidden');
+});
 
 // ── Router ──────────────────────────────────────────
 function navigateTo(page, params) {
@@ -98,8 +158,10 @@ function renderCommittees() {
     return `
     <!-- Left Sidebar -->
     <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
-        <div class="p-8 border-b border-white/5">
-            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em]">Conference Levels</h2>
+        <div class="p-8 pb-4">
+            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Conference Levels</h3>
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Committees</h2>
+            <div class="h-0.5 w-12 bg-accent mt-4"></div>
         </div>
         <nav class="flex-1 py-4">
             ${levels.map(lv => {
@@ -108,7 +170,6 @@ function renderCommittees() {
         return `<div class="mb-1">
                     <a onclick="currentLevel='${lv.id}';currentCommittee=null;render()" class="sidebar-link ${isActive ? 'active' : ''} group flex items-center px-8 py-4 transition-all relative overflow-hidden cursor-pointer ${isActive ? 'bg-secondary text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}">
                         ${isActive ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>' : ''}
-                        <span class="material-symbols-outlined mr-4 ${isActive ? 'text-accent' : ''}">${lv.icon}</span>
                         <span class="font-display uppercase tracking-widest text-sm ${isActive ? 'font-bold' : ''}">${lv.name}</span>
                         ${isActive ? '<span class="material-symbols-outlined ml-auto text-sm">expand_less</span>' : ''}
                     </a>
@@ -139,20 +200,33 @@ function renderCommittees() {
 
 function renderCommitteeCenter(c, level) {
     return `<div class="max-w-5xl mx-auto">
-        <div class="mb-12 border-b border-white/10 pb-12">
+        <div class="pb-6 rounded-t-lg" style="margin-bottom:16px; border-bottom:3px solid rgba(255,255,255,0.1); background:#b71c1c; padding:24px 32px;">
             <div class="flex items-center gap-4 mb-4">
-                <span class="bg-secondary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm">Active Selection</span>
-                <span class="text-accent font-display text-xs uppercase tracking-widest">${level.name} Level</span>
+                <span class="text-white px-3 py-1 font-bold uppercase tracking-widest rounded-sm" style="font-size:12px; background:#191b42;">Active Selection</span>
+                <span class="text-accent font-display uppercase tracking-widest" style="font-size:14px;">${level.name} Level</span>
                 ${c.crisis ? '<span class="bg-red-900/50 text-red-300 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm border border-red-500/30">Crisis</span>' : ''}
             </div>
-            <h1 class="text-7xl lg:text-[10rem] font-display font-bold text-white leading-none tracking-tighter mb-2">${c.name}</h1>
-            <p class="text-xl lg:text-2xl text-gray-300 font-light max-w-3xl mt-6 border-l-4 border-accent pl-6 py-1">
+            ${c.name.length <= 8 ? `
+            <div class="flex items-center gap-0" style="margin-top:8px;">
+                <h1 class="font-display font-bold text-white leading-none tracking-tighter shrink-0" style="font-size:clamp(54px, 10vw, 120px);">${c.name}</h1>
+                <div style="width:4px; align-self:stretch; background:#FFD700; margin:0 24px; border-radius:2px;"></div>
+                <div style="flex:1; min-width:0;">
+                    <p class="text-gray-300 font-light" style="font-size:clamp(14px, 2vw, 18px);">
+                        ${c.description}
+                        <br/><span class="text-white font-medium italic mt-2 inline-block">Language: ${c.lang}.</span>
+                    </p>
+                </div>
+            </div>
+            ` : `
+            <h1 class="font-display font-bold text-white leading-none tracking-tighter mb-2" style="font-size:clamp(54px, 10vw, 120px);">${c.name}</h1>
+            <p class="text-gray-300 font-light max-w-3xl mt-6 border-l-4 border-accent pl-6 py-1" style="font-size:clamp(14px, 2vw, 18px);">
                 ${c.description}
                 <br/><span class="text-white font-medium italic mt-2 inline-block">Language: ${c.lang}.</span>
             </p>
+            `}
         </div>
         <div class="space-y-8">
-            <h2 class="text-gray-500 font-display text-xs uppercase tracking-[0.3em] mb-8">Committee Topics</h2>
+            <h2 class="text-gray-500 font-display font-bold uppercase tracking-[0.3em] mb-4" style="font-size:18px;">Committee Topics</h2>
             ${c.topics.map(t => `
             <div class="topic-card">
                 <div class="bg-white p-8 flex items-center justify-center shrink-0 w-full md:w-64 md:border-r border-white/10 relative overflow-hidden">
@@ -162,12 +236,15 @@ function renderCommitteeCenter(c, level) {
                 </div>
                 <div class="p-8 flex-1 flex flex-col justify-center relative">
                     <div class="absolute top-4 right-4 opacity-10"><span class="material-symbols-outlined text-6xl text-white">${t.icon}</span></div>
-                    <h4 class="text-2xl text-white font-light leading-snug mb-6 pr-8">${t.title}</h4>
-                    <button class="self-start inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-white px-6 py-3 text-xs font-display uppercase tracking-widest transition-colors rounded-sm shadow-lg">
-                        <span class="material-symbols-outlined text-lg">download</span> Download Study Guide
-                    </button>
+                    <h4 class="text-2xl text-white font-light leading-snug pr-8">${t.title}</h4>
                 </div>
             </div>`).join('')}
+            <div style="text-align:center; margin-top:2rem;">
+                <button class="inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-white px-8 py-3 text-xs font-display uppercase tracking-widest transition-colors rounded-sm shadow-lg cursor-pointer">
+                    <span class="material-symbols-outlined text-lg">download</span> Download Study Guide
+                </button>
+                <p style="color:#9ca3af; font-size:11px; margin-top:8px; font-style:italic;">Both topics are covered in a single study guide PDF.</p>
+            </div>
         </div>
     </div>`;
 }
@@ -214,15 +291,57 @@ function renderChairCard(ch) {
     const imgEl = ch.img
         ? `<img alt="${ch.name}" class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" src="${ch.img}"/>`
         : `<div class="w-full h-full rounded-full bg-surface-dark flex items-center justify-center text-white font-display font-bold text-lg">${initials}</div>`;
+    const hoverOn = ch.img ? `onmouseenter="showChairZoom(this, '${ch.img.replace(/'/g, "\\'")}', '${ch.name.replace(/'/g, "\\'")}')"` : '';
+    const hoverOff = ch.img ? `onmouseleave="hideChairZoom()"` : '';
     return `<div class="group flex items-center gap-4 py-2 border-b border-white/5 pb-6 last:border-0">
-        <div class="relative shrink-0">
-            <div class="w-16 h-16 rounded-full border border-white/20 p-1 group-hover:border-accent transition-colors">${imgEl}</div>
+        <div class="relative shrink-0" ${hoverOn} ${hoverOff}>
+            <div class="w-16 h-16 rounded-full border border-white/20 p-1 group-hover:border-accent transition-colors" style="cursor:pointer;">${imgEl}</div>
         </div>
         <div>
             <h5 class="text-base font-bold text-white uppercase tracking-wide">${ch.name}</h5>
             <p class="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">${ch.school}</p>
         </div>
     </div>`;
+}
+
+// Chair zoom popup — rendered as fixed overlay to avoid overflow clipping
+let _chairZoomHideTimer = null;
+
+function showChairZoom(el, imgSrc, name) {
+    // Cancel any pending hide
+    if (_chairZoomHideTimer) { clearTimeout(_chairZoomHideTimer); _chairZoomHideTimer = null; }
+
+    let popup = document.getElementById('chair-zoom-fixed');
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'chair-zoom-fixed';
+        popup.style.cssText = 'position:fixed; z-index:9999; pointer-events:none;';
+        document.body.appendChild(popup);
+    }
+    const rect = el.getBoundingClientRect();
+    const popupSize = 256;
+    // Position to the left of the thumbnail, vertically centered
+    let top = rect.top + rect.height / 2 - popupSize / 2;
+    let left = rect.left - popupSize - 16;
+    // If it would go off-screen left, show to the right instead
+    if (left < 8) left = rect.right + 16;
+    // Keep within vertical bounds
+    if (top < 8) top = 8;
+    if (top + popupSize + 30 > window.innerHeight) top = window.innerHeight - popupSize - 40;
+    popup.style.top = top + 'px';
+    popup.style.left = left + 'px';
+    popup.style.display = 'block';
+    popup.innerHTML = `<img src="${imgSrc}" alt="${name}" style="width:${popupSize}px; height:${popupSize}px; border-radius:12px; object-fit:cover; border:2px solid #FFD700; box-shadow:0 8px 32px rgba(0,0,0,0.6);"/>
+        <p style="text-align:center; color:#fff; font-size:12px; margin-top:6px; font-weight:600; text-shadow:0 1px 4px rgba(0,0,0,0.8);">${name}</p>`;
+}
+
+function hideChairZoom() {
+    // Small delay so moving between photos doesn't flicker
+    _chairZoomHideTimer = setTimeout(() => {
+        const popup = document.getElementById('chair-zoom-fixed');
+        if (popup) { popup.style.display = 'none'; popup.innerHTML = ''; }
+        _chairZoomHideTimer = null;
+    }, 50);
 }
 
 // ── Locations Page ──────────────────────────────────

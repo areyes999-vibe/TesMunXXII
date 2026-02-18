@@ -163,7 +163,7 @@ const TESMUN_DATA = {
             },
             {
                 id: "sclac", name: "SCLAC", lang: "English", crisis: true,
-                description: "Supreme Court of Latin America and the Caribbean \u2013 Crisis Court.",
+                description: "Superior Court of Los Angeles County \u2013 Crisis Court.",
                 icon: "gavel",
                 chairs: [
                     { name: "Matilde Silva", school: "Colegio La Colina" },
