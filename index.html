@@ -11,6 +11,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 
 <body class="bg-tesmun-blue text-gray-100 font-body overflow-x-hidden h-screen flex flex-col">
@@ -20,17 +21,8 @@
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
-                <a onclick="navigateTo('about')"
-                    class="flex-shrink-0 flex flex-col items-center justify-center w-32 cursor-pointer">
-                    <div class="relative w-16 h-16 flex items-center justify-center mb-1">
-                        <span
-                            class="material-symbols-outlined text-white text-6xl absolute opacity-20 rotate-12">public</span>
-                        <span class="material-symbols-outlined text-white text-5xl relative z-10">public</span>
-                        <div class="absolute inset-0 border-2 border-white/30 rounded-full w-full h-full scale-125">
-                        </div>
-                    </div>
-                    <span class="text-white font-display font-bold text-lg tracking-widest leading-none">TESMUN
-                        XXII</span>
+                <a onclick="navigateTo('about')" class="flex-shrink-0 flex items-center justify-center cursor-pointer">
+                    <img src="assets/logos/tesmun.png" alt="TESMUN XXII" class="h-20 w-auto object-contain" />
                 </a>
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex flex-1 justify-center items-center px-8">
@@ -53,15 +45,8 @@
                     </div>
                 </div>
                 <!-- School Logo -->
-                <div class="flex-shrink-0 flex items-center gap-3 border-l border-white/10 pl-6 h-20">
-                    <div class="logo-grid">
-                        <div class="logo-sq"></div>
-                        <div class="logo-sq"></div>
-                        <div class="logo-sq"></div>
-                        <div class="logo-sq"></div>
-                    </div>
-                    <div class="text-white font-body font-bold text-lg leading-tight text-left">
-                        The<br />English<br />School</div>
+                <div class="flex-shrink-0 flex items-center border-l border-white/10 pl-6 h-20">
+                    <img src="assets/logos/tes.png" alt="The English School" class="h-16 w-auto object-contain" />
                 </div>
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center ml-4">
