@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>TESMUN XXII - Committees Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1a237e",
+                        secondary: "#b71c1c",
+                        accent: "#aeea00",
+                        "background-light": "#f5f5f5",
+                        "tesmun-blue": "#141539",
+                        "surface-dark": "#1c1f4a",
+                        "menu-hover": "#ffffff",
+                    },
+                    fontFamily: {
+                        display: ["Oswald", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                    backgroundImage: {
+                        'hero-pattern': "linear-gradient(to bottom, rgba(19, 21, 54, 0.4), rgba(19, 21, 54, 0.9)), url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
+                    }
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        .text-outline-green {
+            -webkit-text-stroke: 1px #aeea00;
+            color: transparent;
+        }
+        .text-outline-white {
+            -webkit-text-stroke: 1px white;
+            color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-link.active {
+            @apply bg-secondary text-white;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #131536;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2c3171;
+            border-radius: 10px;
+        }
+        .nav-item {
+            @apply border-y-2 border-dotted border-white/40 text-white font-body text-sm md:text-base lg:text-lg uppercase px-4 py-3 hover:text-white/80 transition-colors flex items-center justify-center whitespace-nowrap;
+        }
+        .nav-item.active {
+            @apply border-y-4 border-solid border-white font-bold;
+        }
+        .logo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            width: 32px;
+            height: 32px;
+        }
+        .logo-sq {
+            background-color: white;
+            border-radius: 4px;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-tesmun-blue text-gray-100 font-body overflow-x-hidden h-screen flex flex-col">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="shrink-0 z-50 bg-tesmun-blue shadow-lg">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex flex-col items-center justify-center w-32">
+                    <div class="relative w-16 h-16 flex items-center justify-center mb-1">
+                        <span class="material-symbols-outlined text-white text-6xl absolute opacity-20 rotate-12">public</span>
+                        <span class="material-symbols-outlined text-white text-5xl relative z-10">public</span>
+                        <div class="absolute inset-0 border-2 border-white/30 rounded-full w-full h-full scale-125"></div>
+                    </div>
+                    <span class="text-white font-display font-bold text-lg tracking-widest leading-none">TESMUN XXII</span>
+                </div>
+
+                <!-- Main Navigation -->
+                <div class="hidden md:flex flex-1 justify-center items-center px-8">
+                    <div class="flex items-center space-x-6 w-full justify-between max-w-5xl">
+                        <a class="nav-item flex-1 text-center" href="#">About Tesmun XXII</a>
+                        <a class="nav-item flex-1 text-center" href="#">Handbook</a>
+                        <a class="nav-item flex-1 text-center active group relative" href="#">
+                            Committees
+                            <span class="material-symbols-outlined ml-2 text-sm group-hover:rotate-180 transition-transform">expand_more</span>
+                        </a>
+                        <a class="nav-item flex-1 text-center" href="#">Campus</a>
+                        <a class="nav-item flex-1 text-center" href="#">Schedule</a>
+                        <a class="nav-item flex-1 text-center" href="#">Contact Us</a>
+                    </div>
+                </div>
+
+                <!-- School Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3 border-l border-white/10 pl-6 h-20">
+                    <div class="logo-grid">
+                        <div class="logo-sq"></div>
+                        <div class="logo-sq"></div>
+                        <div class="logo-sq"></div>
+                        <div class="logo-sq"></div>
+                    </div>
+                    <div class="text-white font-body font-bold text-lg leading-tight text-left">
+                        The<br/>English<br/>School
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center ml-4">
+                    <button class="text-white hover:text-gray-300" type="button">
+                        <span class="material-symbols-outlined text-3xl">menu</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="flex-1 flex overflow-hidden bg-tesmun-blue">
+
+        <!-- ========== LEFT SIDEBAR ========== -->
+        <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto">
+            <div class="p-8 border-b border-white/5">
+                <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em]">Conference Levels</h2>
+            </div>
+            <nav class="flex-1 py-4">
+                <!-- Bootcamp (Active) -->
+                <div class="mb-1">
+                    <a class="sidebar-link active group flex items-center px-8 py-4 transition-all relative overflow-hidden bg-secondary text-white" href="#">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>
+                        <span class="material-symbols-outlined mr-4 text-accent">school</span>
+                        <span class="font-display uppercase tracking-widest text-sm font-bold">Bootcamp</span>
+                        <span class="material-symbols-outlined ml-auto text-sm">expand_less</span>
+                    </a>
+                    <div class="bg-[#141539] py-2">
+                        <a class="flex items-center pl-16 pr-8 py-3 text-white bg-white/5 border-r-4 border-accent" href="#">
+                            <span class="font-display uppercase tracking-widest text-xs font-bold text-accent">UNICEF</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Junior -->
+                <a class="sidebar-link group flex items-center px-8 py-4 text-gray-400 hover:bg-white/5 hover:text-white transition-all" href="#">
+                    <span class="material-symbols-outlined mr-4">star_rate</span>
+                    <span class="font-display uppercase tracking-widest text-sm">Junior</span>
+                </a>
+                <!-- Intermediate -->
+                <a class="sidebar-link group flex items-center px-8 py-4 text-gray-400 hover:bg-white/5 hover:text-white transition-all" href="#">
+                    <span class="material-symbols-outlined mr-4">trending_up</span>
+                    <span class="font-display uppercase tracking-widest text-sm">Intermediate</span>
+                </a>
+                <!-- Senior -->
+                <a class="sidebar-link group flex items-center px-8 py-4 text-gray-400 hover:bg-white/5 hover:text-white transition-all" href="#">
+                    <span class="material-symbols-outlined mr-4">psychology</span>
+                    <span class="font-display uppercase tracking-widest text-sm">Senior</span>
+                </a>
+                <!-- Expert -->
+                <a class="sidebar-link group flex items-center px-8 py-4 text-gray-400 hover:bg-white/5 hover:text-white transition-all" href="#">
+                    <span class="material-symbols-outlined mr-4">verified</span>
+                    <span class="font-display uppercase tracking-widest text-sm">Expert</span>
+                </a>
+            </nav>
+            <!-- Quick Links -->
+            <div class="p-6 mt-auto">
+                <div class="bg-black/20 rounded-lg p-5 border border-white/5">
+                    <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-3">Quick Links</h3>
+                    <div class="space-y-3">
+                        <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors" href="#">
+                            <span class="material-symbols-outlined text-base">description</span> Delegate Guide
+                        </a>
+                        <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors" href="#">
+                            <span class="material-symbols-outlined text-base">event</span> Calendar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ========== CENTER CONTENT ========== -->
+        <section class="flex-1 overflow-y-auto custom-scrollbar relative px-8 py-10 lg:px-16 lg:py-12 bg-tesmun-blue">
+            <div class="max-w-5xl mx-auto">
+
+                <!-- Committee Header -->
+                <div class="mb-12 border-b border-white/10 pb-12">
+                    <div class="flex items-center gap-4 mb-4">
+                        <span class="bg-secondary text-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-sm">Active Selection</span>
+                        <span class="text-accent font-display text-xs uppercase tracking-widest">Bootcamp Level</span>
+                    </div>
+                    <h1 class="text-8xl lg:text-[10rem] font-display font-bold text-white leading-none tracking-tighter mb-2">UNICEF</h1>
+                    <p class="text-xl lg:text-2xl text-gray-300 font-light max-w-3xl mt-6 border-l-4 border-accent pl-6 py-1">
+                        United Nations Children's Fund - Primary committee for introductory delegates.
+                        <br/><span class="text-white font-medium italic mt-2 inline-block">Language: English.</span>
+                    </p>
+                </div>
+
+                <!-- Committee Topics -->
+                <div class="space-y-8">
+                    <h2 class="text-gray-500 font-display text-xs uppercase tracking-[0.3em] mb-8">Committee Topics</h2>
+
+                    <!-- Topic A -->
+                    <div class="bg-[#1c1f4a]/50 border border-white/10 hover:border-accent/50 transition-all p-0 rounded-xl group overflow-hidden flex flex-col md:flex-row">
+                        <div class="bg-white p-8 flex items-center justify-center shrink-0 w-full md:w-64 md:border-r border-white/10 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-secondary/5"></div>
+                            <h3 class="text-5xl font-display font-bold uppercase text-secondary relative z-10 text-center">Topic<br/><span class="text-6xl">A</span></h3>
+                            <span class="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl text-secondary/10">child_care</span>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-center relative">
+                            <div class="absolute top-4 right-4 opacity-10">
+                                <span class="material-symbols-outlined text-6xl text-white">child_care</span>
+                            </div>
+                            <h4 class="text-2xl text-white font-light leading-snug mb-6 pr-8">
+                                Safeguarding Children Amid Protracted Humanitarian Crises: The Case of the Russian–Ukrainian Conflict.
+                            </h4>
+                            <button class="self-start inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-white px-6 py-3 text-xs font-display uppercase tracking-widest transition-colors rounded-sm shadow-lg">
+                                <span class="material-symbols-outlined text-lg">download</span> Download Study Guide
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Topic B -->
+                    <div class="bg-[#1c1f4a]/50 border border-white/10 hover:border-accent/50 transition-all p-0 rounded-xl group overflow-hidden flex flex-col md:flex-row">
+                        <div class="bg-white p-8 flex items-center justify-center shrink-0 w-full md:w-64 md:border-r border-white/10 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-secondary/5"></div>
+                            <h3 class="text-5xl font-display font-bold uppercase text-secondary relative z-10 text-center">Topic<br/><span class="text-6xl">B</span></h3>
+                            <span class="material-symbols-outlined absolute -bottom-4 -right-4 text-8xl text-secondary/10">public_off</span>
+                        </div>
+                        <div class="p-8 flex-1 flex flex-col justify-center relative">
+                            <div class="absolute top-4 right-4 opacity-10">
+                                <span class="material-symbols-outlined text-6xl text-white">public_off</span>
+                            </div>
+                            <h4 class="text-2xl text-white font-light leading-snug mb-6 pr-8">
+                                Ensuring Every Child's Right to a Nationality: The Situation of Stateless Rohingya Children in Myanmar.
+                            </h4>
+                            <button class="self-start inline-flex items-center gap-2 bg-secondary hover:bg-secondary/80 text-white px-6 py-3 text-xs font-display uppercase tracking-widest transition-colors rounded-sm shadow-lg">
+                                <span class="material-symbols-outlined text-lg">download</span> Download Study Guide
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== RIGHT SIDEBAR ========== -->
+        <aside class="w-80 shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-y-auto">
+            <div class="p-8 pb-4">
+                <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mb-1">The Dais</h2>
+                <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Committee Chairs</h3>
+                <div class="h-0.5 w-12 bg-accent mt-4"></div>
+            </div>
+            <div class="px-6 py-4 space-y-6">
+
+                <!-- Chair: Sara De Castro -->
+                <div class="group flex items-center gap-4 py-2 border-b border-white/5 pb-6 last:border-0">
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 rounded-full border border-white/20 p-1 group-hover:border-accent transition-colors">
+                            <img alt="Sara De Castro"
+                                 class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq8828YPc6n2U5qle9eyGkcCnx8pnRj6VzVzWvG5jC7aiROQKYMn7f8EZeTkD8qRV5L7kvjhyd1qEGlligpWSyEt4qZZFDlM4KG52ph926tWdxCEhCFLHhJ504Upbip59LHvQtNA7jiOsBZgCiuqZbbSHS4iASqANid9LsHQ2JqGyJPyqYQe1YKYo-0Iukro-GDFk8ccsGSdaFnAfDML_684lK2mEyn_dcvcjuFjOuINhvXPtbh9wMjtt6vUe12UBeRu_07Xt-OCOD"/>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-base font-bold text-white uppercase tracking-wide">Sara De Castro</h5>
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">The English School</p>
+                    </div>
+                </div>
+
+                <!-- Chair: Mariana Serna -->
+                <div class="group flex items-center gap-4 py-2 border-b border-white/5 pb-6 last:border-0">
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 rounded-full border border-white/20 p-1 group-hover:border-accent transition-colors">
+                            <img alt="Mariana Serna"
+                                 class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAY0Gaz4iMrP0nZ3-DFvokJdlOdw23xKTttgfkf2ZlgCvmIKovO--WX21W2YbK9QB_zHqC_SCvDIwxngjdnBSw1nzeY68vzU7P3b4FcVZnErxOiRuT20XJ10maX7JvHhFT0EYMR8wRwSI3z3R07S874MItlW-hZwIwdI4jZDaCPqM9qTZg9Hj-6_pR3CHF-Nhvp7R_z2mM9nCaWZKbfgdKo3_nPFcOD9qkI34HPKXmdd9_DHWZEbHufsJbimOQKLcRPUTr9wetLFNd"/>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-base font-bold text-white uppercase tracking-wide">Mariana Serna</h5>
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">The English School</p>
+                    </div>
+                </div>
+
+                <!-- Chair: Adelaida Del Río -->
+                <div class="group flex items-center gap-4 py-2 border-b border-white/5 pb-6 last:border-0">
+                    <div class="relative shrink-0">
+                        <div class="w-16 h-16 rounded-full border border-white/20 p-1 group-hover:border-accent transition-colors">
+                            <img alt="Adelaida Del Río"
+                                 class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeys1QN4blv2PxE4O1M46Kb-S4BRPJPMC6hZ9ZXP0HFPAh0x9qWaTGxjY0_wHDuVubEP__A1bTxnuNQPB1PaoJvU8saKDQFsFzo3tKXBzP-u-sbOmRILkwMdhIMcVzbU-UccbZuuZtYgQVtBW4xk9EBbF4KIuXU11lT3WlF3bvzNZydCVf4T_XFovMxGFpleR9kEzhRNX8AVbpbq-W_Io5Ey2-IrtOMMiwcELJiXWaSmWWc9uOkqfrUTtRhLgomBYWaStASCzdAmJg"/>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-base font-bold text-white uppercase tracking-wide">Adelaida Del Río</h5>
+                        <p class="text-[10px] text-gray-400 font-semibold uppercase mt-1 tracking-wider">Colegio Marymount</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Status Footer -->
+            <div class="mt-auto bg-black/20 p-6 border-t border-white/5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Status</h4>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                            <span class="text-xs text-white font-medium">In Session</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Location</h4>
+                        <span class="text-xs text-white font-medium">Room 402</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="shrink-0 bg-black text-white py-3 border-t border-white/10 z-40">
+        <div class="max-w-full mx-auto px-8 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-white text-base">public</span>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">© 2024 The English School. TESMUN XXII</p>
+            </div>
+            <div class="flex gap-4">
+                <a class="text-gray-500 hover:text-white transition-colors" href="#">
+                    <span class="material-symbols-outlined text-base">alternate_email</span>
+                </a>
+                <a class="text-gray-500 hover:text-white transition-colors" href="#">
+                    <span class="material-symbols-outlined text-base">camera_alt</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
