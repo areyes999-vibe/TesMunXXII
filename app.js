@@ -289,7 +289,7 @@ function renderFactionChairs(chairs) {
 function renderChairCard(ch) {
     const initials = ch.name.split(' ').map(w => w[0]).join('').slice(0, 2);
     const imgEl = ch.img
-        ? `<img alt="${ch.name}" class="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300" src="${ch.img}"/>`
+        ? `<img alt="${ch.name}" class="w-full h-full rounded-full object-cover transition-all duration-300" src="${ch.img}"/>`
         : `<div class="w-full h-full rounded-full bg-surface-dark flex items-center justify-center text-white font-display font-bold text-lg">${initials}</div>`;
     const hoverOn = ch.img ? `onmouseenter="showChairZoom(this, '${ch.img.replace(/'/g, "\\'")}', '${ch.name.replace(/'/g, "\\'")}')"` : '';
     const hoverOff = ch.img ? `onmouseleave="hideChairZoom()"` : '';

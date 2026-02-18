@@ -1783,3 +1783,6 @@ video {
     -webkit-text-stroke: 1px #FF8C00;
     color: transparent
 }
+.bg-hero-pattern{background-image:linear-gradient(180deg,rgba(19,21,54,.4),rgba(19,21,54,.9)),url(group-photo.jpg) !important}
+
+.bg-hero-pattern{background-position:center 35% !important}
