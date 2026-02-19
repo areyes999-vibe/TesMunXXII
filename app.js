@@ -444,7 +444,7 @@ function renderCampus() {
 // ── Schedule Page ───────────────────────────────────
 function renderSchedule() {
     return `<div class="flex-1 overflow-auto page-enter flex items-center justify-center bg-tesmun-blue">
-        <img src="assets/images/schedule.png" alt="TESMUN XXII Schedule" class="w-full h-full object-contain" />
+        <img src="assets/images/schedule.jpeg" alt="TESMUN XXII Schedule" class="w-full h-full object-contain" />
     </div>`;
 }
 
