@@ -649,17 +649,34 @@ const CHAT_WORKER_URL = 'https://tesmun-chat.tesmun-xxii-api.workers.dev/chat';
 let chatHistory = [];
 let lastCitations = []; // store citations from last bot response
 
-function sendChatMessage() {
+// Source text cache: loaded once per session from JSON files
+const sourceTextCache = {};
+
+async function loadSourceText(sourceId) {
+    if (sourceTextCache[sourceId]) return sourceTextCache[sourceId];
+    try {
+        const res = await fetch(`assets/docs/${sourceId}.json`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        sourceTextCache[sourceId] = data;
+        return data;
+    } catch (err) {
+        console.error(`Failed to load source ${sourceId}:`, err);
+        return null;
+    }
+}
+
+async function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const msg = input?.value?.trim();
     if (!msg) return;
     input.value = '';
 
     // Collect selected sources
-    const selectedSources = RESOURCE_SOURCES.filter(s => s.checked).map(s => s.id);
+    const checkedSources = RESOURCE_SOURCES.filter(s => s.checked);
 
     // Guard: no sources selected
-    if (!selectedSources.length) {
+    if (!checkedSources.length) {
         appendChatBubble('bot', 'Please select at least one source document in the left panel to search.', []);
         return;
     }
@@ -670,8 +687,18 @@ function sendChatMessage() {
 
     // Show typing indicator with source count
     const typingId = 'typing-' + Date.now();
-    const sourceNames = RESOURCE_SOURCES.filter(s => s.checked).map(s => s.name);
-    appendTypingIndicator(typingId, sourceNames);
+    appendTypingIndicator(typingId, checkedSources.map(s => s.name));
+
+    // Load source text data in parallel
+    const sourceData = (await Promise.all(
+        checkedSources.map(s => loadSourceText(s.id))
+    )).filter(Boolean);
+
+    if (!sourceData.length) {
+        removeTypingIndicator(typingId);
+        appendChatBubble('bot', 'Unable to load source documents. Please refresh and try again.', []);
+        return;
+    }
 
     // Call Worker
     fetch(CHAT_WORKER_URL, {
@@ -680,7 +707,7 @@ function sendChatMessage() {
         body: JSON.stringify({
             message: msg,
             history: chatHistory.slice(-10),
-            selectedSources,
+            sourceData,
         }),
     })
         .then(res => res.json())
