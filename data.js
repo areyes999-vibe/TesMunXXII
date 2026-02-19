@@ -19,8 +19,8 @@ const TESMUN_DATA = {
                 icon: "child_care",
                 chairs: [
                     { name: "Sara De Castro", school: "The English School", img: "assets/chairs/chair_06.png" },
-                    { name: "Mariana Serna", school: "The English School", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAAY0Gaz4iMrP0nZ3-DFvokJdlOdw23xKTttgfkf2ZlgCvmIKovO--WX21W2YbK9QB_zHqC_SCvDIwxngjdnBSw1nzeY68vzU7P3b4FcVZnErxOiRuT20XJ10maX7JvHhFT0EYMR8wRwSI3z3R07S874MItlW-hZwIwdI4jZDaCPqM9qTZg9Hj-6_pR3CHF-Nhvp7R_z2mM9nCaWZKbfgdKo3_nPFcOD9qkI34HPKXmdd9_DHWZEbHufsJbimOQKLcRPUTr9wetLFNd" },
-                    { name: "Adelaida Del R\u00edo", school: "Colegio Marymount", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAeys1QN4blv2PxE4O1M46Kb-S4BRPJPMC6hZ9ZXP0HFPAh0x9qWaTGxjY0_wHDuVubEP__A1bTxnuNQPB1PaoJvU8saKDQFsFzo3tKXBzP-u-sbOmRILkwMdhIMcVzbU-UccbZuuZtYgQVtBW4xk9EBbF4KIuXU11lT3WlF3bvzNZydCVf4T_XFovMxGFpleR9kEzhRNX8AVbpbq-W_Io5Ey2-IrtOMMiwcELJiXWaSmWWc9uOkqfrUTtRhLgomBYWaStASCzdAmJg" }
+                    { name: "Mariana Serna", school: "The English School" },
+                    { name: "Adelaida Del Río", school: "Colegio Marymount" }
                 ],
                 topics: [
                     { label: "A", title: "Safeguarding Children Amid Protracted Humanitarian Crises: The Case of the Russian\u2013Ukrainian Conflict.", icon: "child_care" },
@@ -36,7 +36,7 @@ const TESMUN_DATA = {
                 chairs: [
                     { name: "Ana Sof\u00eda Rivera", school: "The English School", img: "assets/chairs/chair_01.png" },
                     { name: "Danna Sofia S\u00e1nchez", school: "Colegio San Viator" },
-                    { name: "Sebastian Padilla", school: "The English School" }
+                    { name: "Sebastian Padilla", school: "The English School", img: "assets/chairs/chair_14.png" }
                 ],
                 topics: [
                     { label: "A", title: "La Globalizaci\u00f3n Cultural y la Homogeneizaci\u00f3n de la Juventud: \u00bfP\u00e9rdida de identidad o intercambio cultural positivo?", icon: "language" },
@@ -77,7 +77,7 @@ const TESMUN_DATA = {
                 icon: "local_hospital",
                 chairs: [
                     { name: "Gabriela Valbuena", school: "The English School", img: "assets/chairs/chair_03.png" },
-                    { name: "Alejandro Guzman", school: "The English School" },
+                    { name: "Alejandro Guzman", school: "The English School", img: "assets/chairs/chair_12.png" },
                     { name: "Sara Barbosa", school: "Colegio Marymount" }
                 ],
                 topics: [
@@ -93,7 +93,7 @@ const TESMUN_DATA = {
                 icon: "home_work",
                 chairs: [
                     { name: "Juan Felipe Berrocal", school: "The English School" },
-                    { name: "Enrique Chavez", school: "The English School" },
+                    { name: "Enrique Chavez", school: "The English School", img: "assets/chairs/chair_13.png" },
                     { name: "Valentina Castellanos", school: "Saint Matthew School" }
                 ],
                 topics: [
