@@ -618,7 +618,7 @@ function renderHandbook() {
                     <span class="material-symbols-outlined text-accent text-sm">smart_toy</span>
                 </div>
                 <div class="bg-white/5 rounded-lg rounded-tl-none p-4 text-sm text-gray-300 leading-relaxed">
-                    Welcome! I can answer questions based on the selected source documents. I'll cite specific pages so you can verify my answers. Try asking about rules of procedure, committee topics, or anything else in the sources. Click a <button class="citation-chip" style="cursor:default;pointer-events:none">1</button> to jump to that page in the document.
+                    Welcome!<br><br>I'm an AI chatbot that provides answers ONLY based on the selected documents.<br><br>Try asking about rules of procedure, committee topics, or anything else in the handbook!<br><br>Click a <button class="citation-chip" style="cursor:default;pointer-events:none">1</button> to jump to that page in the document.
                 </div>
             </div>
         </div>

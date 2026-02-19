@@ -1912,4 +1912,5 @@ video {
 #chat-input {
     color: #fff !important;
     caret-color: #fff;
+    background: transparent !important;
 }
