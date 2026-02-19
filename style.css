@@ -1785,7 +1785,7 @@ video {
 }
 
 .bg-hero-pattern {
-    background-image: linear-gradient(180deg, rgba(19, 21, 54, .4), rgba(19, 21, 54, .9)), url(group-photo.jpg) !important
+    background-image: linear-gradient(180deg, rgba(19, 21, 54, .4), rgba(19, 21, 54, .9)), url(assets/images/group-photo.jpg) !important
 }
 
 .bg-hero-pattern {
