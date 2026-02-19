@@ -1914,3 +1914,42 @@ video {
     caret-color: #fff;
     background: transparent !important;
 }
+
+/* ── Panel Transitions ─────────────────────────────── */
+.panel-transition {
+    transition: width 0.25s ease, min-width 0.25s ease, opacity 0.2s ease;
+}
+
+/* ── Resize Handles ────────────────────────────────── */
+.resize-handle {
+    width: 6px;
+    cursor: col-resize;
+    background: transparent;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    transition: background 0.15s ease;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+    background: rgba(0, 184, 148, 0.4);
+}
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 1px;
+    transition: background 0.15s ease, height 0.15s ease;
+}
+
+.resize-handle:hover::after {
+    background: rgba(0, 184, 148, 0.7);
+    height: 48px;
+}

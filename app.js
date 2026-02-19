@@ -444,7 +444,7 @@ function renderCampus() {
 // ── Schedule Page ───────────────────────────────────
 function renderSchedule() {
     return `<div class="flex-1 overflow-auto page-enter flex items-center justify-center bg-tesmun-blue">
-        <img src="assets/schedule.png" alt="TESMUN XXII Schedule" class="w-full h-full object-contain" />
+        <img src="assets/images/schedule.png" alt="TESMUN XXII Schedule" class="w-full h-full object-contain" />
     </div>`;
 }
 
@@ -510,9 +510,81 @@ let pdfScale = 1.5;
 let pdfRendering = false;
 let pdfPendingRender = null;
 
+// ── Panel State ─────────────────────────────────────
+let leftPanelOpen = true;
+let rightPanelOpen = true;
+let leftPanelWidth = 288; // 18rem = 288px
+let rightPanelWidth = 320; // 20rem = 320px
+
+function toggleLeftPanel() {
+    leftPanelOpen = !leftPanelOpen;
+    const panel = document.getElementById('left-panel');
+    const btn = document.getElementById('left-toggle-icon');
+    if (panel) {
+        panel.style.width = leftPanelOpen ? leftPanelWidth + 'px' : '0px';
+        panel.style.minWidth = leftPanelOpen ? leftPanelWidth + 'px' : '0px';
+        panel.style.overflow = leftPanelOpen ? '' : 'hidden';
+        panel.style.padding = leftPanelOpen ? '' : '0';
+        panel.style.opacity = leftPanelOpen ? '1' : '0';
+    }
+    if (btn) btn.textContent = leftPanelOpen ? 'left_panel_close' : 'left_panel_open';
+}
+
+function toggleRightPanel() {
+    rightPanelOpen = !rightPanelOpen;
+    const panel = document.getElementById('right-panel');
+    const btn = document.getElementById('right-toggle-icon');
+    if (panel) {
+        panel.style.width = rightPanelOpen ? rightPanelWidth + 'px' : '0px';
+        panel.style.minWidth = rightPanelOpen ? rightPanelWidth + 'px' : '0px';
+        panel.style.overflow = rightPanelOpen ? '' : 'hidden';
+        panel.style.padding = rightPanelOpen ? '' : '0';
+        panel.style.opacity = rightPanelOpen ? '1' : '0';
+    }
+    if (btn) btn.textContent = rightPanelOpen ? 'right_panel_close' : 'right_panel_open';
+}
+
+function initResizeHandles() {
+    const leftHandle = document.getElementById('left-resize-handle');
+    const rightHandle = document.getElementById('right-resize-handle');
+
+    function makeDraggable(handle, side) {
+        if (!handle) return;
+        let startX, startW;
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const panel = document.getElementById(side + '-panel');
+            if (!panel) return;
+            startX = e.clientX;
+            startW = panel.getBoundingClientRect().width;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+
+            function onMove(ev) {
+                const delta = side === 'left' ? ev.clientX - startX : startX - ev.clientX;
+                const newW = Math.max(200, Math.min(500, startW + delta));
+                panel.style.width = newW + 'px';
+                panel.style.minWidth = newW + 'px';
+                if (side === 'left') leftPanelWidth = newW;
+                else rightPanelWidth = newW;
+            }
+            function onUp() {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        });
+    }
+    makeDraggable(leftHandle, 'left');
+    makeDraggable(rightHandle, 'right');
+}
+
 function renderHandbook() {
-    // Schedule PDF load after DOM injection
-    setTimeout(() => initPdfViewer(), 0);
+    // Schedule PDF load and resize handles after DOM injection
+    setTimeout(() => { initPdfViewer(); initResizeHandles(); }, 0);
 
     const sourceListHtml = RESOURCE_SOURCES.map((src, i) => `
             <div class="group flex items-center gap-3 px-6 py-3 cursor-pointer transition-all hover:bg-white/5 ${src.id === activeResourceId ? 'bg-secondary/20 border-l-2 border-accent' : 'border-l-2 border-transparent'}" onclick="selectResourceSource('${src.id}')">
@@ -531,7 +603,7 @@ function renderHandbook() {
 
     return `
     <!-- Left Sidebar – Sources Panel -->
-    <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
+    <aside id="left-panel" class="shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter panel-transition" style="width:${leftPanelOpen ? leftPanelWidth + 'px' : '0px'}; min-width:${leftPanelOpen ? leftPanelWidth + 'px' : '0px'}; opacity:${leftPanelOpen ? '1' : '0'}; ${leftPanelOpen ? '' : 'overflow:hidden; padding:0;'}">
         <div class="p-8 pb-4">
             <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Resources</h3>
             <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Download or Select to Chat</h2>
@@ -553,14 +625,19 @@ function renderHandbook() {
         <nav class="flex-1 py-2 overflow-y-auto custom-scrollbar">
             ${sourceListHtml}
         </nav>
-
-
     </aside>
 
+    <!-- Left Resize Handle -->
+    <div id="left-resize-handle" class="resize-handle"></div>
+
     <!-- Center – PDF Viewer -->
-    <div class="flex-1 flex flex-col overflow-hidden page-enter">
+    <div class="flex-1 flex flex-col overflow-hidden page-enter" style="min-width:200px">
         <!-- Toolbar -->
-        <div class="shrink-0 bg-[#191b42] border-b border-white/10 px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+        <div class="shrink-0 bg-[#191b42] border-b border-white/10 px-2 py-3 flex items-center justify-between gap-2 flex-wrap">
+            <!-- Left Panel Toggle -->
+            <button onclick="toggleLeftPanel()" class="text-gray-400 hover:text-white transition-colors shrink-0" title="Toggle Resources Panel">
+                <span id="left-toggle-icon" class="material-symbols-outlined text-lg">${leftPanelOpen ? 'left_panel_close' : 'left_panel_open'}</span>
+            </button>
             <div class="flex items-center gap-3 flex-wrap">
                 <!-- Page Nav -->
                 <div class="flex items-center gap-2 bg-black/30 rounded-lg px-3 py-1.5 border border-white/10">
@@ -591,6 +668,10 @@ function renderHandbook() {
                     <span class="text-xs font-display uppercase tracking-widest hidden sm:inline">Print</span>
                 </button>
             </div>
+            <!-- Right Panel Toggle -->
+            <button onclick="toggleRightPanel()" class="text-gray-400 hover:text-white transition-colors shrink-0" title="Toggle AI Assistant">
+                <span id="right-toggle-icon" class="material-symbols-outlined text-lg">${rightPanelOpen ? 'right_panel_close' : 'right_panel_open'}</span>
+            </button>
         </div>
         <!-- PDF Canvas Container -->
         <div class="flex-1 overflow-auto custom-scrollbar bg-[#0d0e2a]" id="pdf-container">
@@ -605,8 +686,11 @@ function renderHandbook() {
         </div>
     </div>
 
+    <!-- Right Resize Handle -->
+    <div id="right-resize-handle" class="resize-handle"></div>
+
     <!-- Right Sidebar – AI Assistant -->
-    <aside class="w-80 shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-hidden">
+    <aside id="right-panel" class="shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-hidden panel-transition" style="width:${rightPanelOpen ? rightPanelWidth + 'px' : '0px'}; min-width:${rightPanelOpen ? rightPanelWidth + 'px' : '0px'}; opacity:${rightPanelOpen ? '1' : '0'}; ${rightPanelOpen ? '' : 'overflow:hidden; padding:0;'}">
         <div class="p-8 pb-4">
             <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mb-1">AI Assistant</h2>
             <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Ask TESMUN</h3>
