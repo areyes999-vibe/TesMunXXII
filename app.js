@@ -497,11 +497,9 @@ function toggleAllSources() {
     document.getElementById('app').innerHTML = renderHandbook();
 }
 
-function updateSourceSelection() {
-    document.querySelectorAll('.source-checkbox').forEach(cb => {
-        const src = RESOURCE_SOURCES.find(s => s.id === cb.dataset.sourceId);
-        if (src) src.checked = cb.checked;
-    });
+function toggleSource(id) {
+    const src = RESOURCE_SOURCES.find(s => s.id === id);
+    if (src) src.checked = !src.checked;
     document.getElementById('app').innerHTML = renderHandbook();
 }
 
@@ -518,14 +516,14 @@ function renderHandbook() {
 
     const sourceListHtml = RESOURCE_SOURCES.map((src, i) => `
             <div class="group flex items-center gap-3 px-6 py-3 cursor-pointer transition-all hover:bg-white/5 ${src.id === activeResourceId ? 'bg-secondary/20 border-l-2 border-accent' : 'border-l-2 border-transparent'}" onclick="selectResourceSource('${src.id}')">
-                <label class="flex items-center cursor-pointer" onclick="event.stopPropagation()">
-                    <input type="checkbox" class="source-checkbox sr-only" data-source-id="${src.id}" ${src.checked ? 'checked' : ''} onchange="updateSourceSelection()" />
-                    <span class="w-5 h-5 rounded border ${src.checked ? 'bg-accent border-accent' : 'border-gray-500'} flex items-center justify-center transition-colors">
-                        ${src.checked ? '<span class="material-symbols-outlined text-white text-sm">check</span>' : ''}
-                    </span>
-                </label>
+                <span class="source-cb w-5 h-5 rounded border-2 ${src.checked ? 'bg-[#00b894] border-[#00b894]' : 'border-white'} flex items-center justify-center transition-colors cursor-pointer shrink-0" data-source-id="${src.id}" onclick="event.stopPropagation(); toggleSource('${src.id}')">
+                    ${src.checked ? '<span class="material-symbols-outlined text-white text-xs" style="font-size:14px">check</span>' : ''}
+                </span>
                 <span class="material-symbols-outlined ${src.id === activeResourceId ? 'text-accent' : 'text-secondary'} text-lg shrink-0">picture_as_pdf</span>
                 <span class="text-sm ${src.id === activeResourceId ? 'text-white font-bold' : 'text-gray-300'} truncate flex-1">${src.name}</span>
+                <a href="${src.url}" download="${src.name}.pdf" onclick="event.stopPropagation()" class="shrink-0 text-secondary hover:text-red-400 transition-colors" title="Download ${src.name}">
+                    <span class="material-symbols-outlined text-base">download</span>
+                </a>
             </div>`).join('');
 
     const allChecked = RESOURCE_SOURCES.every(s => s.checked);
@@ -535,19 +533,19 @@ function renderHandbook() {
     <!-- Left Sidebar – Sources Panel -->
     <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
         <div class="p-8 pb-4">
-            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Sources</h3>
-            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Documents</h2>
+            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">Resources</h3>
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Download or Select to Chat</h2>
             <div class="h-0.5 w-12 bg-accent mt-4"></div>
         </div>
 
         <!-- Select All -->
         <div class="flex items-center justify-between px-6 py-3 border-b border-white/5">
-            <label class="flex items-center gap-3 cursor-pointer" onclick="toggleAllSources()">
-                <span class="w-5 h-5 rounded border ${allChecked ? 'bg-accent border-accent' : 'border-gray-500'} flex items-center justify-center transition-colors">
-                    ${allChecked ? '<span class="material-symbols-outlined text-white text-sm">check</span>' : ''}
+            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleAllSources()">
+                <span class="w-5 h-5 rounded border-2 ${allChecked ? 'bg-[#00b894] border-[#00b894]' : 'border-white'} flex items-center justify-center transition-colors">
+                    ${allChecked ? '<span class="material-symbols-outlined text-white text-xs" style="font-size:14px">check</span>' : ''}
                 </span>
                 <span class="text-xs text-gray-400 font-display uppercase tracking-wider">Select all sources</span>
-            </label>
+            </div>
             <span class="text-[10px] text-gray-500 font-mono">${checkedCount}/${RESOURCE_SOURCES.length}</span>
         </div>
 
@@ -556,13 +554,7 @@ function renderHandbook() {
             ${sourceListHtml}
         </nav>
 
-        <!-- Download Active -->
-        <div class="mt-auto bg-black/20 p-6 border-t border-white/5">
-            <a href="${getActiveResource().url}" download="${getActiveResource().name}.pdf" class="bg-secondary hover:bg-secondary/80 text-white border border-secondary/50 rounded-lg px-4 py-2 transition-colors flex items-center justify-center gap-2 w-full" title="Download">
-                <span class="material-symbols-outlined text-lg">download</span>
-                <span class="text-xs font-display uppercase tracking-widest">Download PDF</span>
-            </a>
-        </div>
+
     </aside>
 
     <!-- Center – PDF Viewer -->
@@ -626,7 +618,7 @@ function renderHandbook() {
                     <span class="material-symbols-outlined text-accent text-sm">smart_toy</span>
                 </div>
                 <div class="bg-white/5 rounded-lg rounded-tl-none p-4 text-sm text-gray-300 leading-relaxed">
-                    Welcome! I can answer questions based on the selected source documents. I'll cite specific pages so you can verify my answers. Try asking about dress code, rules of procedure, committee topics, or anything in the sources. Click a <button class="citation-chip" style="cursor:default;pointer-events:none">1</button> to jump to that page in the document.
+                    Welcome! I can answer questions based on the selected source documents. I'll cite specific pages so you can verify my answers. Try asking about rules of procedure, committee topics, or anything else in the sources. Click a <button class="citation-chip" style="cursor:default;pointer-events:none">1</button> to jump to that page in the document.
                 </div>
             </div>
         </div>

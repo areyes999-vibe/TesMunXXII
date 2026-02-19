@@ -1907,3 +1907,9 @@ video {
     animation: page-glow 1.2s ease-in-out 2;
     border-radius: 4px;
 }
+
+/* ── Chat Input Fix ────────────────────────────────── */
+#chat-input {
+    color: #fff !important;
+    caret-color: #fff;
+}
