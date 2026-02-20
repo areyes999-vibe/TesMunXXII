@@ -402,10 +402,38 @@ function renderAboutCenter(section) {
                 </div>`;
             break;
         case 'mission':
-            content = `<div class="max-w-4xl mx-auto"><h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-none tracking-tighter mb-8">${section.name}</h1><div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all"><p class="text-gray-300 font-light leading-relaxed text-lg">${d.mission}</p></div></div>`;
+            content = `<div class="max-w-5xl mx-auto">
+                    <div class="pb-6 rounded-t-lg" style="margin-bottom:16px; border-bottom:3px solid rgba(255,255,255,0.1); background:#b71c1c; padding:24px 32px;">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-white px-3 py-1 font-bold uppercase tracking-widest rounded-sm" style="font-size:12px; background:#191b42;">About TESMUN</span>
+                            <span class="text-accent font-display uppercase tracking-widest" style="font-size:14px;">Mission</span>
+                        </div>
+                        <h1 class="font-display font-bold text-white leading-none tracking-tighter" style="font-size:clamp(54px, 10vw, 120px);">Our Mission</h1>
+                    </div>
+
+                    <div class="space-y-12 text-gray-300 font-light leading-relaxed text-2xl">
+                        <div>
+                            <p>${d.mission}</p>
+                        </div>
+                    </div>
+                </div>`;
             break;
         case 'vision':
-            content = `<div class="max-w-4xl mx-auto"><h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-none tracking-tighter mb-8">${section.name}</h1><div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all"><p class="text-gray-300 font-light leading-relaxed text-lg">${d.vision}</p></div></div>`;
+            content = `<div class="max-w-5xl mx-auto">
+                    <div class="pb-6 rounded-t-lg" style="margin-bottom:16px; border-bottom:3px solid rgba(255,255,255,0.1); background:#b71c1c; padding:24px 32px;">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-white px-3 py-1 font-bold uppercase tracking-widest rounded-sm" style="font-size:12px; background:#191b42;">About TESMUN</span>
+                            <span class="text-accent font-display uppercase tracking-widest" style="font-size:14px;">Vision</span>
+                        </div>
+                        <h1 class="font-display font-bold text-white leading-none tracking-tighter" style="font-size:clamp(54px, 10vw, 120px);">Our Vision</h1>
+                    </div>
+
+                    <div class="space-y-12 text-gray-300 font-light leading-relaxed text-2xl">
+                        <div>
+                            <p>${d.vision}</p>
+                        </div>
+                    </div>
+                </div>`;
             break;
         case 'contact':
             content = `<div class="max-w-4xl mx-auto">
