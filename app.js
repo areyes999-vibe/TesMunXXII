@@ -1,9 +1,10 @@
 // TESMUN XXII — Application Logic (Router + Page Renderers)
 
-let currentPage = 'about';
+let currentPage = 'home';
 let currentLevel = 'bootcamp';
 let currentCommittee = null;
 let currentLang = 'en'; // 'en' or 'es' — for future i18n
+let currentAboutSection = 'mun'; // Default about section
 
 // ── Language Toggle ──────────────────────────────────
 function toggleLanguage() {
@@ -79,10 +80,14 @@ function render() {
     document.querySelectorAll('#nav-links .nav-item').forEach(a => {
         a.classList.toggle('active', a.dataset.page === currentPage);
     });
-    const renderers = { about: renderAbout, handbook: renderHandbook, committees: renderCommittees, campus: renderCampus, schedule: renderSchedule, contact: renderContact };
+    const renderers = { home: renderHome, about: renderAbout, handbook: renderHandbook, committees: renderCommittees, campus: renderCampus, schedule: renderSchedule };
     const fn = renderers[currentPage] || renderAbout;
     app.innerHTML = fn();
     app.querySelector('.page-enter')?.offsetHeight; // force reflow for animation
+    // Setup scroll sync for history slide viewer
+    if (currentPage === 'about' && currentAboutSection === 'history') {
+        setupHistoryScrollSync();
+    }
 }
 
 function toggleMobileMenu() {
@@ -92,9 +97,8 @@ function toggleMobileMenu() {
     icon.textContent = m.classList.contains('hidden') ? 'menu' : 'close';
 }
 
-// ── About Page ──────────────────────────────────────
-function renderAbout() {
-    const d = TESMUN_DATA.about;
+// ── Home Page ───────────────────────────────────────
+function renderHome() {
     return `
     <div class="flex-1 overflow-y-auto custom-scrollbar page-enter">
         <!-- Hero -->
@@ -114,25 +118,8 @@ function renderAbout() {
                 </div>
             </div>
         </div>
-        <!-- Mission & Vision -->
-        <div class="max-w-6xl mx-auto px-8 py-16 grid md:grid-cols-2 gap-8">
-            <div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-accent text-3xl">flag</span>
-                    <h2 class="font-display text-2xl font-bold text-white uppercase tracking-widest">Mission</h2>
-                </div>
-                <p class="text-gray-300 font-light leading-relaxed text-sm">${d.mission}</p>
-            </div>
-            <div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="material-symbols-outlined text-accent text-3xl">visibility</span>
-                    <h2 class="font-display text-2xl font-bold text-white uppercase tracking-widest">Vision</h2>
-                </div>
-                <p class="text-gray-300 font-light leading-relaxed text-sm">${d.vision}</p>
-            </div>
-        </div>
         <!-- Stats -->
-        <div class="max-w-6xl mx-auto px-8 pb-16">
+        <div class="max-w-6xl mx-auto px-8 py-16">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 ${[{ n: '14', l: 'Committees', i: 'groups' }, { n: '5', l: 'Levels', i: 'stairs' }, { n: '4', l: 'Days', i: 'event' }, { n: '30+', l: 'Chairs', i: 'person' }].map(s => `
                 <div class="bg-black/20 border border-white/5 rounded-xl p-6 text-center hover:border-accent/30 transition-all">
@@ -143,6 +130,308 @@ function renderAbout() {
             </div>
         </div>
     </div>`;
+}
+
+// ── About Page ──────────────────────────────────────
+// ── About Page ──────────────────────────────────────
+const ABOUT_SECTIONS = [
+    { id: 'mun', name: 'MUN', icon: 'public' },
+    { id: 'history', name: 'History of TESMUN', icon: 'history_edu' },
+    { id: 'mission', name: 'Mission', icon: 'flag' },
+    { id: 'vision', name: 'Vision', icon: 'visibility' },
+    { id: 'contact', name: 'Contact', icon: 'mail' }
+];
+
+function renderAbout() {
+    const activeSection = ABOUT_SECTIONS.find(s => s.id === currentAboutSection) || ABOUT_SECTIONS[0];
+
+    return `
+    <!-- Left Sidebar -->
+    <aside class="w-72 shrink-0 bg-[#191b42] border-r border-white/5 flex flex-col overflow-y-auto page-enter">
+        <div class="p-8 pb-4">
+            <h3 class="text-white font-display text-2xl font-bold uppercase leading-tight">About TESMUN</h3>
+            <h2 class="text-gray-400 font-display text-xs uppercase tracking-[0.2em] mt-1" style="padding-left:32px;">Overview</h2>
+            <div class="h-0.5 w-12 bg-accent mt-4"></div>
+        </div>
+        <nav class="flex-1 py-4">
+            ${ABOUT_SECTIONS.map(s => {
+        const isActive = s.id === currentAboutSection;
+        return `<div class="mb-1">
+                    <a onclick="currentAboutSection='${s.id}';render()" class="sidebar-link ${isActive ? 'active' : ''} group flex items-center px-8 py-4 transition-all relative overflow-hidden cursor-pointer ${isActive ? 'bg-secondary text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}">
+                        ${isActive ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent"></div>' : ''}
+                        
+                        <span class="font-display uppercase tracking-widest text-sm ${isActive ? 'font-bold' : ''}">${s.name}</span>
+                        ${isActive ? '<span class="material-symbols-outlined ml-auto text-sm">expand_less</span>' : ''}
+                    </a>
+                </div>`;
+    }).join('')}
+        </nav>
+        <div class="p-6 mt-auto">
+            <div class="bg-black/20 rounded-lg p-5 border border-white/5">
+                <h3 class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-3">Quick Links</h3>
+                <div class="space-y-3">
+                    <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors cursor-pointer" onclick="navigateTo('committees')"><span class="material-symbols-outlined text-base">groups</span> Committees</a>
+                    <a class="text-xs text-gray-300 hover:text-white flex items-center gap-2 transition-colors cursor-pointer" onclick="navigateTo('schedule')"><span class="material-symbols-outlined text-base">event</span> Schedule</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+    <!-- Center Content -->
+    <section class="flex-1 overflow-y-auto custom-scrollbar relative px-8 py-10 lg:px-16 lg:py-12 bg-tesmun-blue">
+        ${renderAboutCenter(activeSection)}
+    </section>
+    <!-- Right Panel -->
+    ${renderAboutRightPanel(activeSection)}`;
+}
+
+// History section → image mapping
+const HISTORY_SECTION_IMAGES = {
+    'history-intro': 'assets/images/infographic-evolution.jpeg',
+    'history-2003': 'assets/images/history/2003.jpeg',
+    'history-2004': 'assets/images/history/2004.jpeg',
+    'history-2005': 'assets/images/history/2005.jpeg',
+    'history-2006': 'assets/images/history/2006.jpeg',
+    'history-2007': 'assets/images/history/2007.jpeg',
+    'history-2008': 'assets/images/history/2008.jpeg',
+    'history-2009': 'assets/images/history/2009.jpeg',
+    'history-2010': 'assets/images/history/2010.jpeg',
+    'history-2011': 'assets/images/history/2011.jpeg',
+    'history-2012': 'assets/images/history/2012.jpeg',
+    'history-2013': 'assets/images/history/2013.jpeg',
+    'history-2014': 'assets/images/history/2014.jpeg'
+};
+
+function renderAboutRightPanel(section) {
+    if (section.id === 'history') {
+        const firstImg = Object.values(HISTORY_SECTION_IMAGES).find(v => v);
+        return `<aside class="w-80 shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-hidden">
+            <div class="flex-1 flex items-center justify-center p-4">
+                <div id="history-slide-viewer" class="w-full">
+                    <img id="history-slide-img" src="${firstImg}" alt="" class="w-full h-auto block rounded-lg" style="transition: opacity 0.4s ease;" />
+                </div>
+            </div>
+        </aside>`;
+    }
+    return `<aside class="w-80 shrink-0 bg-[#16183d] border-l border-white/5 flex flex-col overflow-y-auto">
+        <div class="px-4 py-4 flex-1 overflow-y-auto"></div>
+    </aside>`;
+}
+
+function setupHistoryScrollSync() {
+    const scrollContainer = document.querySelector('#app section.flex-1.overflow-y-auto');
+    const sections = scrollContainer?.querySelectorAll('[data-year]');
+    const img = document.getElementById('history-slide-img');
+    if (!scrollContainer || !sections?.length || !img) return;
+
+    let currentSlide = null;
+
+    const observer = new IntersectionObserver((entries) => {
+        let topVisible = null;
+        let topY = Infinity;
+        entries.forEach(entry => {
+            if (entry.isIntersecting && entry.boundingClientRect.top < topY) {
+                topY = entry.boundingClientRect.top;
+                topVisible = entry.target;
+            }
+        });
+        if (!topVisible) return;
+        const yearId = topVisible.dataset.year;
+        if (yearId === currentSlide) return;
+        currentSlide = yearId;
+        const newSrc = HISTORY_SECTION_IMAGES[yearId];
+        if (newSrc) {
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = newSrc;
+                img.style.opacity = '1';
+            }, 300);
+        } else {
+            img.style.opacity = '0.2';
+        }
+    }, {
+        root: scrollContainer,
+        threshold: 0,
+        rootMargin: '0px 0px -70% 0px'
+    });
+
+    sections.forEach(s => observer.observe(s));
+}
+
+function renderAboutCenter(section) {
+    const d = TESMUN_DATA.about;
+    let content = '';
+
+    switch (section.id) {
+        case 'mun':
+            content = `<div class="max-w-5xl mx-auto">
+                    <div class="pb-6 rounded-t-lg" style="margin-bottom:16px; border-bottom:3px solid rgba(255,255,255,0.1); background:#b71c1c; padding:24px 32px;">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-white px-3 py-1 font-bold uppercase tracking-widest rounded-sm" style="font-size:12px; background:#191b42;">About TESMUN</span>
+                            <span class="text-accent font-display uppercase tracking-widest" style="font-size:14px;">Model United Nations</span>
+                        </div>
+                        <h1 class="font-display font-bold text-white leading-none tracking-tighter" style="font-size:clamp(54px, 10vw, 120px);">MUN</h1>
+                    </div>
+
+                    <div class="space-y-12 text-gray-300 font-light leading-relaxed text-2xl">
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Overview</h2>
+
+                        <div>
+                            <p class="mb-4"><strong class="text-white font-medium">Model United Nations (MUN)</strong> are simulations which recreate the real procedures of the United Nations Organization. The main objective of the activity is to encourage different opportunities for middle and high school students in which they can learn and reflect about current global problematics.</p>
+                            <p class="mb-4">Throughout this process, students develop essential skills, including:</p>
+                            <ul class="list-none space-y-3 mb-4 pl-4">
+                                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-accent text-xl">search</span> <strong class="text-white font-medium">Investigation and Research</strong></li>
+                                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-accent text-xl">record_voice_over</span> <strong class="text-white font-medium">Public Speaking</strong></li>
+                                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-accent text-xl">handshake</span> <strong class="text-white font-medium">Diplomatic Negotiation</strong></li>
+                            </ul>
+                            <p><strong class="text-white font-medium">Academic Excellence</strong>: Simulations are also academic experiences which encourage participants to develop autonomy and leadership.</p>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Global Interaction and Responsibility</h2>
+
+                        <div>
+                            <p class="mb-4">These conferences provide spaces for students to interact with young delegates from different cities in Colombia and around the world. Participants must debate and write resolutions regarding international disputes and conflicts.</p>
+                            <p class="mb-4">During the development of MUN, students assume the role of <strong class="text-white font-medium">diplomats</strong> from their assigned country in an environment that simulates the UN. The real success of these conferences is found in:</p>
+                            <ol class="list-none space-y-3 pl-4">
+                                <li class="flex items-start gap-3"><span class="text-accent font-display font-bold text-xl">1.</span> The <strong class="text-white font-medium">seriousness</strong> with which delegates perform their role.</li>
+                                <li class="flex items-start gap-3"><span class="text-accent font-display font-bold text-xl">2.</span> The application of <strong class="text-white font-medium">political and diplomatic abilities</strong>.</li>
+                            </ol>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Leadership and Future Prospects</h2>
+
+                        <div>
+                            <p class="mb-4">In addition, MUN provides students with spaces to develop leadership under the role of delegates or presidents.</p>
+                            <p>These environments help develop new skills in the participant delegates and assist them in finding a <strong class="text-white font-medium">professional orientation for the future</strong>.</p>
+                        </div>
+
+                    </div>
+                </div>`;
+            break;
+        case 'history':
+            content = `<div class="max-w-5xl mx-auto">
+                    <div data-year="history-intro" class="pb-6 rounded-t-lg" style="margin-bottom:16px; border-bottom:3px solid rgba(255,255,255,0.1); background:#b71c1c; padding:24px 32px;">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-white px-3 py-1 font-bold uppercase tracking-widest rounded-sm" style="font-size:12px; background:#191b42;">About TESMUN</span>
+                            <span class="text-accent font-display uppercase tracking-widest" style="font-size:14px;">History</span>
+                        </div>
+                        <h1 class="font-display font-bold text-white leading-none tracking-tighter" style="font-size:clamp(54px, 10vw, 120px);">The Origins of TESMUN</h1>
+                    </div>
+
+                    <div class="space-y-12 text-gray-300 font-light leading-relaxed text-2xl">
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Inception and the Inaugural Conference <span class="text-accent">(2003–2004)</span></h2>
+
+                        <div data-year="history-2003">
+                            <p class="mb-4">Driven by a vision to provide students with a global perspective, <strong class="text-white font-medium">The English School</strong> first engaged with the Model United Nations (MUN) circuit in 2003. This initiative was spearheaded by a small group of ambitious upper school students: María Ximena Lozano, Lina Henao, Estefanía Tapias, Felipe Guerrero, Juan Sebastián Robledo, and Juan Sebastián Dachiardi.</p>
+                        </div>
+
+                        <div data-year="history-2004">
+                            <p class="mb-4">Following a series of distinguished performances within Bogotá's burgeoning MUN community, this group set out to establish the school's own model in 2004. After extensive proposals and deliberations with school leadership and faculty, <strong class="text-white font-medium">TESMUN</strong> was officially integrated into the academic calendar.</p>
+                            <p>The first conference was a true grassroots effort, characterized by hand-stapled handbooks and recycled classroom materials. Despite being an internal event, <strong class="text-white font-medium">TESMUN I</strong> was a resounding success, drawing approximately 100 students who transformed their everyday classrooms into arenas of high-level diplomatic debate.</p>
+                        </div>
+
+                        <img src="assets/images/infographic-evolution.jpeg" alt="The Evolution of TESMUN" class="w-full h-auto block rounded-lg" style="margin-top:2rem; margin-bottom:2rem;" />
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Expanding Horizons: TESMUN II and III <span class="text-accent">(2005–2006)</span></h2>
+
+                        <div data-year="history-2005">
+                            <p>By 2005, a new generation of delegates sought to push the boundaries of the program, leading The English School to its first national and international MUN appearances. Buoyed by the success of the previous year, the school provided the funding necessary for <strong class="text-white font-medium">TESMUN II</strong> to welcome external participants. This edition also saw the creation of the official TESMUN emblem—a logo that remains the symbol of the conference today. The event grew to accommodate 150 delegates, including many from outside Bogotá.</p>
+                        </div>
+
+                        <div data-year="history-2006">
+                            <p>In 2006, the project gained formal institutional backing, with the TESMUN curriculum being integrated into the 8th-grade academic program and recognized across other levels. <strong class="text-white font-medium">TESMUN III</strong> continued this upward trajectory, hosting roughly 200 delegates from seven external schools who debated across seven specialized committees.</p>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">A Major Leap: TESMUN IV <span class="text-accent">(2007)</span></h2>
+
+                        <div data-year="history-2007">
+                            <p class="mb-4">The year 2007 marked a pivotal milestone as the conference transitioned from the school campus to the <strong class="text-white font-medium">Cafam Floresta Convention Center</strong> in Bogotá. This move signaled the model's transition to a national stage, attracting corporate sponsorships and aligning the academic project with tangible social impact.</p>
+                            <p>With fifteen schools from across Colombia participating, attendance rose to 450 delegates. This edition saw the launch of the highly acclaimed <strong class="text-white font-medium">Comisión Bogotá</strong>, a "real-action" committee designed to immerse delegates in the challenges of their own city. On the final day of the conference, students implemented action plans directly within marginalized neighborhoods. TESMUN IV was overseen by Faculty Sponsor Professor Fabio Cárdenas and Secretaries General Juan Camilo Orduz and Carolina Sintura, who led an extensive team to ensure the highest standards of diplomatic formality.</p>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Social Responsibility and Continued Growth: TESMUN V and VI <span class="text-accent">(2008–2009)</span></h2>
+
+                        <div data-year="history-2008">
+                            <p>In 2008, <strong class="text-white font-medium">TESMUN V</strong> focused on deepening its social mission. The organization launched a landmark sponsorship program, enabling students from agricultural communities, indigenous populations, and under-resourced public and private schools to participate in an MUN for the first time. The team conducted specialized training sessions within these communities to ensure they were fully prepared for the diplomatic experience. With 650 delegates, TESMUN solidified its reputation as a model of national coverage and inclusive access.</p>
+                        </div>
+
+                        <div data-year="history-2009">
+                            <p>By 2009, the sixth iteration of TESMUN became the largest MUN conference in Colombia. Dedicated to the formation of "World Citizens," <strong class="text-white font-medium">TESMUN VI</strong> introduced plenary sessions and lectures led by experts to foster critical thinking and rigorous debate. The conference reached a record attendance of 750 delegates.</p>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">Scaling New Heights and International Reach: TESMUN VII to IX <span class="text-accent">(2010–2012)</span></h2>
+
+                        <div data-year="history-2010">
+                            <p>In 2010, <strong class="text-white font-medium">TESMUN VII</strong> maintained its status as the country's largest MUN while preserving the personalized attention that defined the "TESMUN experience." That year, 850 delegates participated, with total attendance reaching 1,000. The academic rigor was enhanced by collaborations with distinguished guest speakers, including the President of the Supreme Court of Justice and Colombian representatives to the United Nations.</p>
+                        </div>
+
+                        <div data-year="history-2011">
+                            <p>In 2011, <strong class="text-white font-medium">TESMUN VIII</strong> welcomed over 60 public and private schools, totaling 1,000 participants. The conference achieved international recognition by awarding two scholarships to Hult University in London and hosting prominent figures such as Senator Juan Manuel Galán and David Luna.</p>
+                        </div>
+
+                        <div data-year="history-2012">
+                            <p>The 2012 edition, <strong class="text-white font-medium">TESMUN IX</strong>, marked the conference's true international debut, welcoming delegations from Ecuador, Mexico, and Chile. The model featured 19 committees—ten in Spanish and nine in English—highlighting innovative dynamics within the Crisis and "Historical Colombia" committees.</p>
+                        </div>
+
+                        <div class="h-px bg-white/10"></div>
+
+                        <h2 class="font-display text-4xl font-bold text-white uppercase tracking-widest mb-4">A Decade of Excellence <span class="text-accent">(2013–2014)</span></h2>
+
+                        <div data-year="history-2013">
+                            <p>Marking its tenth anniversary in 2013, <strong class="text-white font-medium">TESMUN X</strong> celebrated a decade of diplomatic excellence by expanding to 21 committees. The conference projected a massive participation of 1,200 delegates, drawing students from Bogotá, across Colombia, and around the world, cementing its legacy as a cornerstone of the global MUN community.</p>
+                        </div>
+
+                        <div data-year="history-2014">
+                            <p>Building on a decade of achievement, <strong class="text-white font-medium">TESMUN XI</strong> in 2014 continued to expand the conference's reach and refine its academic rigor, setting the stage for the next chapter in a legacy of diplomatic excellence.</p>
+                        </div>
+
+                    </div>
+                </div>`;
+            break;
+        case 'mission':
+            content = `<div class="max-w-4xl mx-auto"><h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-none tracking-tighter mb-8">${section.name}</h1><div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all"><p class="text-gray-300 font-light leading-relaxed text-lg">${d.mission}</p></div></div>`;
+            break;
+        case 'vision':
+            content = `<div class="max-w-4xl mx-auto"><h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-none tracking-tighter mb-8">${section.name}</h1><div class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/30 transition-all"><p class="text-gray-300 font-light leading-relaxed text-lg">${d.vision}</p></div></div>`;
+            break;
+        case 'contact':
+            content = `<div class="max-w-4xl mx-auto">
+                <p class="text-accent font-display text-xs uppercase tracking-[0.4em] mb-4">Get in Touch</p>
+                <h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-none tracking-tighter mb-12">Contact Us</h1>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <a href="mailto:tesmun@englishschool.edu.co" class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/50 transition-all group block">
+                        <span class="material-symbols-outlined text-accent text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">email</span>
+                        <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest mb-3">Email</h2>
+                        <p class="text-gray-300 text-lg group-hover:text-accent transition-colors">tesmun@englishschool.edu.co</p>
+                    </a>
+                    <a href="https://instagram.com/officialtesmun" target="_blank" class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/50 transition-all group block">
+                        <span class="material-symbols-outlined text-accent text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">camera_alt</span>
+                        <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest mb-3">Instagram</h2>
+                        <p class="text-gray-300 text-lg group-hover:text-accent transition-colors">@officialtesmun</p>
+                    </a>
+                </div>
+                <div class="mt-12 bg-black/20 border border-white/5 rounded-xl p-10 text-center">
+                    <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">school</span>
+                    <h3 class="font-display text-lg font-bold text-white uppercase tracking-widest mb-2">The English School</h3>
+                    <p class="text-gray-400 text-sm">Bogotá, Colombia</p>
+                </div>
+            </div>`;
+            break;
+    }
+    return content;
 }
 
 // ── Committees Page ─────────────────────────────────
@@ -448,32 +737,7 @@ function renderSchedule() {
     </div>`;
 }
 
-// ── Contact Page ────────────────────────────────────
-function renderContact() {
-    return `<div class="flex-1 overflow-y-auto custom-scrollbar page-enter px-8 py-12 lg:px-16">
-        <div class="max-w-4xl mx-auto">
-            <p class="text-accent font-display text-xs uppercase tracking-[0.4em] mb-4">Get in Touch</p>
-            <h1 class="text-6xl md:text-8xl font-display font-bold text-white leading-none tracking-tighter mb-12">Contact Us</h1>
-            <div class="grid md:grid-cols-2 gap-8">
-                <a href="mailto:tesmun@englishschool.edu.co" class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/50 transition-all group block">
-                    <span class="material-symbols-outlined text-accent text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">email</span>
-                    <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest mb-3">Email</h2>
-                    <p class="text-gray-300 text-lg group-hover:text-accent transition-colors">tesmun@englishschool.edu.co</p>
-                </a>
-                <a href="https://instagram.com/officialtesmun" target="_blank" class="bg-[#1c1f4a]/50 border border-white/10 rounded-xl p-10 hover:border-accent/50 transition-all group block">
-                    <span class="material-symbols-outlined text-accent text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">camera_alt</span>
-                    <h2 class="font-display text-xl font-bold text-white uppercase tracking-widest mb-3">Instagram</h2>
-                    <p class="text-gray-300 text-lg group-hover:text-accent transition-colors">@officialtesmun</p>
-                </a>
-            </div>
-            <div class="mt-12 bg-black/20 border border-white/5 rounded-xl p-10 text-center">
-                <span class="material-symbols-outlined text-gray-600 text-6xl mb-4">school</span>
-                <h3 class="font-display text-lg font-bold text-white uppercase tracking-widest mb-2">The English School</h3>
-                <p class="text-gray-400 text-sm">Bogotá, Colombia</p>
-            </div>
-        </div>
-    </div>`;
-}
+
 
 // ── Resources / Sources ─────────────────────────────
 const RESOURCE_SOURCES = [
